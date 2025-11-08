@@ -12,7 +12,10 @@ const DoctorCard: React.FC<Props> = ({ doctor }: Props) => {
     return (
         <div
             className="border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500"
-            onClick={() => navigate(`/appointment/${doctor._id}`)}
+            onClick={() => {
+                navigate(`/appointment/${doctor._id}`);
+                scrollTo(0, 0);
+            }}
         >
             <img src={doctor.image} className="bg-blue-50" alt="" />
             <div className="p-4">

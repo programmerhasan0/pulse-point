@@ -1,9 +1,11 @@
 import { useParams } from 'react-router-dom';
 import { AppContext } from '@context/contexts';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { Doctor } from '@definitions/assets';
 import { TimeSlot } from '@definitions/doctor';
 import { assets } from '@assets/assets_frontend/assets';
+import RelatedDoctors from '@components/RelatedDoctors';
+import AppointmentModal from '@components/AppointmentModal';
 
 const Appointment: React.FC = () => {
     const daysOfWeek: string[] = [
@@ -21,8 +23,11 @@ const Appointment: React.FC = () => {
     const [docSlots, setDocSlots] = useState<TimeSlot[][]>([]);
     const [slotIndex, setSlotIndex] = useState<number>(0);
     const [slotTime, setSlotTime] = useState<string>('');
+    const [isAppointmentModalOpen, setIsAppointmentModalOpen] =
+        useState<boolean>(false);
 
-    const fetchDocInfo = async () => {
+    // fetching doctor info
+    const fetchDocInfo = useCallback(async () => {
         const docInfo = doctors.find((doc) => doc._id === docId);
         if (docInfo) {
             setDocInfo(docInfo);
@@ -30,19 +35,19 @@ const Appointment: React.FC = () => {
         } else {
             console.log('No doctors found');
         }
-    };
+    }, [doctors, docId]);
 
     const getAvailableSlots = async () => {
         setDocSlots([]);
         // getting current date;
-        let today = new Date();
+        const today = new Date();
         for (let i = 0; i < 7; i++) {
             // getting date with index
-            let currentDate = new Date(today);
+            const currentDate = new Date(today);
             currentDate.setDate(today.getDate() + i);
 
             // setting end time of the date with index
-            let endTime = new Date();
+            const endTime = new Date();
             endTime.setDate(today.getDate() + i);
             endTime.setHours(21, 0, 0, 0);
 
@@ -82,7 +87,7 @@ const Appointment: React.FC = () => {
 
     useEffect(() => {
         fetchDocInfo();
-    }, [doctors, docId]);
+    }, [fetchDocInfo]);
 
     useEffect(() => {
         getAvailableSlots();
@@ -138,10 +143,14 @@ const Appointment: React.FC = () => {
                 {/* -------- Booking Slots -------- */}
                 <div className="sm:ml-72 sm:pl-4 mt-4 font-medium text-gray-700 ">
                     <p>Booking Slots</p>
-                    <div>
+                    <div className="flex gap-3 items-center w-full overflow-x-scroll mt-4 ">
                         {docSlots.length &&
                             docSlots.map((item, idx) => (
-                                <div key={idx}>
+                                <div
+                                    onClick={() => setSlotIndex(idx)}
+                                    className={`text-center py-6 min-w-16 rounded-full transition-all duration-200 cursor-pointer ${slotIndex === idx ? 'bg-primary text-white' : 'border border-gray-200'}`}
+                                    key={idx}
+                                >
                                     <p>
                                         {item[0] &&
                                             daysOfWeek[
@@ -154,7 +163,38 @@ const Appointment: React.FC = () => {
                                 </div>
                             ))}
                     </div>
+                    <div className="flex items-center gap-3 w-full overflow-x-scroll mt-4">
+                        {docSlots.length &&
+                            docSlots[slotIndex].map((item, idx) => (
+                                <p
+                                    onClick={() => setSlotTime(item.time)}
+                                    key={idx}
+                                    className={`text-sm font-light shrink-0 px-5 py-2 rounded-full cursor-pointer ${item.time === slotTime ? 'bg-primary text-white' : 'text-gray-400 border border-gray-300'}`}
+                                >
+                                    {item.time.toLowerCase()}
+                                </p>
+                            ))}
+                    </div>
+                    <p className="text-primary mt-4 text-sm font-light">
+                        Use Shift+Scroll or touch gestures to scroll the time
+                        slots
+                    </p>
+
+                    <button
+                        className="bg-primary text-white text-sm font-light px-14 py-3 rounded-full my-6 cursor-pointer"
+                        onClick={() => setIsAppointmentModalOpen(true)}
+                    >
+                        Book an appointment
+                    </button>
                 </div>
+                {/* -------- Listing related doctors -------- */}
+
+                <RelatedDoctors docId={docId} speciality={docInfo.speciality} />
+                <AppointmentModal
+                    isAppointmentModalOpen={isAppointmentModalOpen}
+                    setIsAppointmentModalOpen={setIsAppointmentModalOpen}
+                    docInfo={docInfo}
+                />
             </div>
         )
     );
