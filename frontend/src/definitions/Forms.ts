@@ -7,3 +7,9 @@ export type AppointmentFormInput = {
     appointmentDate: Date;
     appointmentTime: string;
 };
+
+export type RegisterLoginFormInput = {
+    fullName?: string;
+    email: string;
+    password: string;
+};
