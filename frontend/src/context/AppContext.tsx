@@ -8,7 +8,11 @@ type Props = {
 
 const AppContextProvider: React.FC<Props> = ({ children }) => {
     const currencySymbol: string = '$';
-    const value: AppContextValue = { doctors, specialityData, currencySymbol };
+    const value: AppContextValue = {
+        doctors,
+        specialityData,
+        currencySymbol,
+    };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

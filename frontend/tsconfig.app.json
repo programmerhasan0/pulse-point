@@ -7,7 +7,8 @@
             "@definitions/*": ["definitions/*"],
             "@components/*": ["components/*"],
             "@pages/*": ["pages/*"],
-            "@context/*": ["context/*"]
+            "@context/*": ["context/*"],
+            "@utils/*": ["utils/*"]
         },
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
         "target": "ES2020",
