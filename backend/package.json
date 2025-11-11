@@ -1,0 +1,29 @@
+{
+    "type": "module",
+    "name": "pulse-point-backend",
+    "version": "1.0.0",
+    "description": "Backend app for pulse point. A doctors appointment booking app",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node index.js",
+        "dev": "nodemon index.js"
+    },
+    "author": "programmerhasan0@gmail.com",
+    "license": "ISC",
+    "dependencies": {
+        "@getbrevo/brevo": "^3.0.1",
+        "bcryptjs": "^3.0.3",
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.3",
+        "express": "^5.1.0",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^8.19.3"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.5",
+        "@types/mongoose": "^5.11.96",
+        "@types/node": "^24.10.0",
+        "prettier": "3.6.2"
+    }
+}
