@@ -5,6 +5,7 @@ import {
     postPasswordReset,
     postPasswordResetToken,
     patchDoctorUpdatePassword,
+    getDoctors,
 } from '../controllers/auth.controller.js';
 
 const authRouter = Router();
@@ -13,6 +14,8 @@ authRouter.post('/login', postLogin);
 authRouter.post('/create-account', postCreateAccount);
 authRouter.post('/get-reset-token', postPasswordResetToken);
 authRouter.post('/reset-password', postPasswordReset);
+
 authRouter.patch('/doctor/update-password', patchDoctorUpdatePassword);
+authRouter.get('/doctor/get-all', getDoctors);
 
 export default authRouter;

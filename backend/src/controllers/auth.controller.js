@@ -233,3 +233,20 @@ export const patchDoctorUpdatePassword = async (req, res) => {
     }
     return new ApiResponse(res).error();
 };
+
+export const getDoctors = async (req, res) => {
+    const doctors = await User.find({ role: 'doctor' })
+        .select('_id name email gender role speciality qualification')
+        .populate('speciality');
+
+    if (doctors.length > 0) {
+        return new ApiResponse(res).success(
+            200,
+            'ok',
+            'doctors found',
+            doctors
+        );
+    }
+
+    return new ApiResponse(res).error(404, 'not found', 'Doctors not found');
+};
