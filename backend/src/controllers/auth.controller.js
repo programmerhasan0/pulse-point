@@ -43,6 +43,12 @@ export const postLogin = async (req, res, next) => {
                 'Login Successful',
                 { token }
             );
+        } else {
+            return new ApiResponse(res).error(
+                401,
+                "doesn't match",
+                "passwords doesn't match"
+            );
         }
     } else {
         return new ApiResponse(res).error(
@@ -120,7 +126,6 @@ export const postCreateAccount = async (req, res, next) => {
     }
 };
 
-// TODO : password reset
 export const postPasswordResetToken = async (req, res, next) => {
     if (req.user) {
         return new ApiResponse(res).error(
@@ -159,4 +164,47 @@ export const postPasswordResetToken = async (req, res, next) => {
         'sent',
         'If your email is found in our database, a reset link has been sent to your email'
     );
+};
+
+export const postPasswordReset = async (req, res, next) => {
+    const { token, password, confirmPassword } = req?.body;
+
+    if (!(token && password && confirmPassword)) {
+        return new ApiResponse(res).error(
+            400,
+            'missing fields',
+            'one or more fields are missing.'
+        );
+    }
+
+    if (password !== confirmPassword) {
+        return new ApiResponse(res).error(
+            400,
+            'not match',
+            "Passwords doesn't match"
+        );
+    }
+
+    const hashedTokenFromClient = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+
+    const passwordHash = await bcrypt.hash(password, +process.env.BCRYPT_SALT);
+
+    const updateUser = await User.findOneAndUpdate(
+        { token: hashedTokenFromClient },
+        { password: passwordHash },
+        { new: true }
+    );
+
+    if (updateUser.password.length > 0) {
+        return new ApiResponse(res).success(
+            204,
+            'updated',
+            'Password updated! Please login'
+        );
+    }
+
+    return new ApiResponse(res).error();
 };
