@@ -27,10 +27,28 @@ const userSchema = new db.Schema({
         enum: ['patient', 'doctor', 'admin', 'staff'],
         required: true,
     },
+    speciality: {
+        type: db.Schema.Types.ObjectId,
+        ref: 'Speciality',
+        required: function () {
+            return this.role === 'doctor';
+        },
+    },
+    qualification: {
+        type: String,
+        required: function () {
+            return this.role === 'doctor';
+        },
+    },
     appointments: [],
     token: {
         type: String,
         required: false,
+    },
+    isActive: {
+        type: Boolean,
+        default: true,
+        required: true,
     },
 });
 

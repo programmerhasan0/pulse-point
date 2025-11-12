@@ -35,7 +35,7 @@ export const sendWelcomeEmail = (name, email) => {
         .catch((err) => console.log('email err', err));
 };
 
-export const sendPasswordRestMail = ({ name, email }, token) => {
+export const sendPasswordResetMail = ({ name, email }, token) => {
     const message = new SendSmtpEmail();
 
     message.subject = 'Password Reset - Pulse Point';
@@ -49,6 +49,28 @@ export const sendPasswordRestMail = ({ name, email }, token) => {
     <h3>Password Reset - Pulse Point</h3>
     <hr/>
     <p>Please reset your password by clicking <a href="${process.env.FRONTEND_URL}/reset-password?token=${token}">here</a></p>
+    `;
+
+    apiInstance
+        .sendTransacEmail(message)
+        .then((res) => console.log('Email res : ', res))
+        .catch((err) => console.log('email err', err));
+};
+
+export const sendCreatePasswordMail = ({ name, email }, token) => {
+    const message = new SendSmtpEmail();
+
+    message.subject = 'Create - Pulse Point';
+    message.sender = {
+        name: process.env.SENDER_NAME,
+        email: process.env.SENDER_EMAIL,
+    };
+    message.to = [{ name, email }];
+    message.htmlContent = `
+    <p>Hi doctor, ${name} </p>
+    <h3>Password Create - Pulse Point</h3>
+    <hr/>
+    <p>Please create your password by clicking <a href="${process.env.FRONTEND_URL}/doctor/create-password?token=${token}">here</a></p>
     `;
 
     apiInstance

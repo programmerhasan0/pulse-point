@@ -1,5 +1,5 @@
-import Speciality from '../models/speciality.model.js';
-import ApiResponse from '../utils/ApiResponse.util.js';
+import Speciality from '../../models/speciality.model.js';
+import ApiResponse from '../../utils/ApiResponse.util.js';
 
 export const getSpecialities = async (req, res) => {
     if (req.user?.role === 'admin' || req.user?.role === 'staff') {
@@ -25,15 +25,16 @@ export const getSpecialities = async (req, res) => {
 
 export const postAddSpeciality = async (req, res) => {
     if (req.user?.role === 'admin') {
-        const { title, slug } = req?.body;
+        const { title, slug, department } = req?.body;
 
-        if (!(title && slug)) {
+        if (!(title && slug && department)) {
             return new ApiResponse(res).badRequest();
         }
 
         const speciality = new Speciality({
             title,
             slug,
+            department,
             isActive: true,
         });
 

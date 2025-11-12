@@ -8,7 +8,7 @@ import crypto from 'crypto';
 import ApiResponse from '../utils/ApiResponse.util.js';
 import User from '../models/user.model.js';
 import {
-    sendPasswordRestMail,
+    sendPasswordResetMail,
     sendWelcomeEmail,
 } from '../utils/sendEmail.util.js';
 
@@ -149,7 +149,7 @@ export const postPasswordResetToken = async (req, res, next) => {
     );
 
     if (updateUser.token.length > 0) {
-        sendPasswordRestMail(updateUser, resetToken);
+        sendPasswordResetMail(updateUser, resetToken);
     }
     return new ApiResponse(res).success(
         200,
@@ -199,4 +199,37 @@ export const postPasswordReset = async (req, res, next) => {
         'invalid',
         'Invalid token! Please try to reset again.'
     );
+};
+
+export const patchDoctorUpdatePassword = async (req, res) => {
+    const { token, password, confirmPassword } = req?.body;
+
+    if (!(token && password && confirmPassword)) {
+        return new ApiResponse(res).badRequest();
+    }
+
+    if (password !== confirmPassword) {
+        return new ApiResponse(res).badRequest("passwords didn't match");
+    }
+
+    const genPwPrivateKey = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+
+    const passwordHash = await bcrypt.hash(password, +process.env.BCRYPT_SALT);
+    const doctor = await User.findOneAndUpdate(
+        { token: genPwPrivateKey },
+        { password: passwordHash, isActive: true, token: null },
+        { new: true }
+    );
+
+    if (doctor.password.length > 0) {
+        return new ApiResponse(res).success(
+            200,
+            'ok',
+            'Password Created! Please Login'
+        );
+    }
+    return new ApiResponse(res).error();
 };

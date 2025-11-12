@@ -10,6 +10,10 @@ const specialitySchema = new db.Schema({
         required: true,
         unique: true,
     },
+    department: {
+        type: String,
+        required: true,
+    },
     isActive: {
         type: Boolean,
         required: true,
