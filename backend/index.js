@@ -1,9 +1,13 @@
 import { config } from 'dotenv';
 config();
 import express from 'express';
-import authRouter from './src/routes/auth.route.js';
+import authMiddleware from './src/middlewares/auth.middleware.js';
 import ApiResponse from './src/utils/ApiResponse.util.js';
 import cors from 'cors';
+
+//routes
+import authRouter from './src/routes/auth.route.js';
+import adminRouter from './src/routes/admin.route.js';
 
 const app = express();
 
@@ -18,6 +22,7 @@ app.get('/', (req, res) =>
 
 // routes
 app.use('/api/auth/', authRouter);
+app.use('/api/admin/', authMiddleware, adminRouter);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

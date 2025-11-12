@@ -16,11 +16,7 @@ export const postLogin = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!(email, password)) {
-        return new ApiResponse(res).error(
-            400,
-            'Bad request',
-            'One or more fields are missing'
-        );
+        return new ApiResponse(res).badRequest();
     }
 
     const user = await User.findOne({ email });
@@ -74,11 +70,7 @@ export const postCreateAccount = async (req, res, next) => {
             age
         )
     ) {
-        return new ApiResponse(res).error(
-            400,
-            'Bad request',
-            'One or more fields are missing'
-        );
+        return new ApiResponse(res).badRequest();
     }
 
     if (password !== confirmPassword) {
@@ -170,11 +162,7 @@ export const postPasswordReset = async (req, res, next) => {
     const { token, password, confirmPassword } = req?.body;
 
     if (!(token && password && confirmPassword)) {
-        return new ApiResponse(res).error(
-            400,
-            'missing fields',
-            'one or more fields are missing.'
-        );
+        return new ApiResponse(res).badRequest();
     }
 
     if (password !== confirmPassword) {
@@ -194,17 +182,21 @@ export const postPasswordReset = async (req, res, next) => {
 
     const updateUser = await User.findOneAndUpdate(
         { token: hashedTokenFromClient },
-        { password: passwordHash },
+        { password: passwordHash, token: null },
         { new: true }
     );
 
-    if (updateUser.password.length > 0) {
+    if (updateUser?.password.length > 0) {
         return new ApiResponse(res).success(
-            204,
+            200,
             'updated',
             'Password updated! Please login'
         );
     }
 
-    return new ApiResponse(res).error();
+    return new ApiResponse(res).success(
+        400,
+        'invalid',
+        'Invalid token! Please try to reset again.'
+    );
 };

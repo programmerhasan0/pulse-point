@@ -8,11 +8,7 @@ const authMiddleware = async (req, res, next) => {
     const { authorization } = req.headers;
 
     if (!authorization) {
-        return new ApiResponse(res).error(
-            401,
-            'unauthorized',
-            'Unahorized! please login'
-        );
+        return new ApiResponse(res).unauthorized('Unahorized! please login');
     }
 
     try {
@@ -25,15 +21,11 @@ const authMiddleware = async (req, res, next) => {
     } catch (err) {
         if (err instanceof jwt.JsonWebTokenError) {
             if (err instanceof jwt.TokenExpiredError) {
-                return new ApiResponse(res).error(
-                    401,
-                    'unauthorized',
+                return new ApiResponse(res).unauthorized(
                     'Token expired! Please relogin'
                 );
             } else {
-                return new ApiResponse(res).error(
-                    401,
-                    'unauthorized',
+                return new ApiResponse(res).unauthorized(
                     'Invalid token! Please relogin'
                 );
             }

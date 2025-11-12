@@ -24,6 +24,25 @@ class ApiResponse {
         this.res.json({ code, status, message, data });
         return this;
     }
+
+    unauthorized(
+        message = 'Sorry! you are not authorized to perform this operation',
+        data = []
+    ) {
+        this.res.status(401);
+        this.res.json({ code: 401, status: 'unauthorized', message, data });
+        return this;
+    }
+
+    badRequest(
+        message = 'One or more fields are missing',
+        status = 'missing fields',
+        data = []
+    ) {
+        this.res.status(400);
+        this.res.json({ code: 400, status, message, data });
+        return this;
+    }
 }
 
 export default ApiResponse;
