@@ -28,6 +28,10 @@ const userSchema = new db.Schema({
         required: true,
     },
     appointments: [],
+    token: {
+        type: String,
+        required: false,
+    },
 });
 
 const User = db.model('User', userSchema);

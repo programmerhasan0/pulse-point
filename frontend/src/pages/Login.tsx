@@ -1,17 +1,28 @@
 import { RegisterLoginFormInput } from '@definitions/Forms';
+import axios from 'axios';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+axios.defaults.withCredentials = true;
+
 const Login: React.FC = () => {
-    const [isRegisterForm, setIsRegisterForm] = useState<boolean>(true);
+    const [isRegisterForm, setIsRegisterForm] = useState<boolean>(false);
     const { register, handleSubmit } = useForm<RegisterLoginFormInput>();
 
     const onSubmit = (data: RegisterLoginFormInput): void => {
-        const formData = data;
         if (!isRegisterForm) {
-            delete formData.fullName;
+            const newData = data;
+            delete newData.fullName;
+            console.log(newData);
+            axios
+                .post(
+                    `${import.meta.env.VITE_BACKEND_URL}/auth/login`,
+                    newData,
+                    { withCredentials: true }
+                )
+                .then((res) => console.log('logging the res', res))
+                .catch((err) => console.log('logging the error', err));
         }
-        console.log(formData);
     };
 
     return (

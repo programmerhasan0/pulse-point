@@ -3,12 +3,54 @@ import { config } from 'dotenv';
 config();
 
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import ApiResponse from '../utils/ApiResponse.util.js';
 import User from '../models/user.model.js';
-import { sendWelcomeEmail } from '../utils/sendEmail.util.js';
+import {
+    sendPasswordRestMail,
+    sendWelcomeEmail,
+} from '../utils/sendEmail.util.js';
 
-export const postLogin = (req, res, next) => {
-    console.log(req.body);
+export const postLogin = async (req, res, next) => {
+    const { email, password } = req.body;
+
+    if (!(email, password)) {
+        return new ApiResponse(res).error(
+            400,
+            'Bad request',
+            'One or more fields are missing'
+        );
+    }
+
+    const user = await User.findOne({ email });
+    if (user) {
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+        if (isPasswordMatch) {
+            const token = jwt.sign(
+                {
+                    _id: user._id.toString(),
+                    email: user.email,
+                    name: user.name,
+                },
+                process.env.JWT_PASS,
+                { expiresIn: '1d' }
+            );
+            return new ApiResponse(res).success(
+                200,
+                'ops success',
+                'Login Successful',
+                { token }
+            );
+        }
+    } else {
+        return new ApiResponse(res).error(
+            400,
+            'user not found',
+            'User not found with the corresponding email'
+        );
+    }
 };
 
 export const postCreateAccount = async (req, res, next) => {
@@ -76,4 +118,45 @@ export const postCreateAccount = async (req, res, next) => {
             return new ApiResponse(res).error();
         }
     }
+};
+
+// TODO : password reset
+export const postPasswordResetToken = async (req, res, next) => {
+    if (req.user) {
+        return new ApiResponse(res).error(
+            400,
+            'logged in',
+            'You are already logged in'
+        );
+    }
+    const { email } = req?.body;
+
+    if (!email) {
+        return new ApiResponse(res).error(
+            400,
+            'email required',
+            'Please provide your email'
+        );
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+    const updateUser = await User.findOneAndUpdate(
+        { email },
+        { token: hashedToken },
+        { new: true }
+    );
+
+    if (updateUser.token.length > 0) {
+        sendPasswordRestMail(updateUser, resetToken);
+    }
+    return new ApiResponse(res).success(
+        200,
+        'sent',
+        'If your email is found in our database, a reset link has been sent to your email'
+    );
 };
