@@ -7,6 +7,7 @@ import {
     postCreateAppointment,
     getAllAppointments,
     getSingleDoctorAppointments,
+    putEditAppointmentDateTime,
 } from '../controllers/appointment.controller.js';
 
 // doctors appointment related routes
@@ -17,6 +18,7 @@ appointmentRouter.get('/view/get-all', getAllAppointments);
 
 // common appointment related routes
 appointmentRouter.post('/create', postCreateAppointment);
+appointmentRouter.put('/edit', putEditAppointmentDateTime);
 appointmentRouter.get('/view/:appointmentId', getSingleAppointment);
 
 export default appointmentRouter;

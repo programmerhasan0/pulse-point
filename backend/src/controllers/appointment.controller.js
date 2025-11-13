@@ -136,3 +136,37 @@ export const getSingleDoctorAppointments = async (req, res) => {
         );
     }
 };
+
+export const putEditAppointmentDateTime = async (req, res) => {
+    const { _id, date, time } = req?.body;
+
+    if (!(_id && date && time) && isValidObjectId(_id)) {
+        return new ApiResponse(res).badRequest('missing fields or invalid id');
+    }
+
+    let updateQuery = null;
+
+    if (req.user?.role === 'admin' || req.user?.role === 'staff')
+        updateQuery = { _id };
+    else if (req.user?.role === 'doctor')
+        updateQuery = { _id, doctor: req.user.id };
+
+    const updatedAppointment = await Appointment.findOneAndUpdate(
+        updateQuery,
+        { date: new Date(date), time },
+        { new: true }
+    );
+
+    if (updatedAppointment) {
+        return new ApiResponse(res).success(
+            200,
+            'ok',
+            'appointment updated',
+            updatedAppointment
+        );
+    }
+
+    return new ApiResponse(res).unauthorized(
+        "sorry! you're not allowed to perform this operation"
+    );
+};
