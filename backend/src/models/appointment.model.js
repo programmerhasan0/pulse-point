@@ -2,12 +2,12 @@ import db from '../utils/db.util.js';
 
 const appointmentSchema = new db.Schema(
     {
-        user_id: {
+        user: {
             type: db.Schema.Types.ObjectId,
             ref: 'User',
             required: true,
         },
-        doctor_id: {
+        doctor: {
             type: db.Schema.Types.ObjectId,
             ref: 'User',
             required: true,
@@ -34,6 +34,11 @@ const appointmentSchema = new db.Schema(
         isPaid: {
             type: Boolean,
             default: false,
+            required: true,
+        },
+        status: {
+            type: String,
+            enum: ['booked', 'completed', 'resheduled', 'cancelled'],
             required: true,
         },
     },

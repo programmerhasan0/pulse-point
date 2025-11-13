@@ -194,6 +194,8 @@ const Appointment: React.FC = () => {
                     isAppointmentModalOpen={isAppointmentModalOpen}
                     setIsAppointmentModalOpen={setIsAppointmentModalOpen}
                     docInfo={docInfo}
+                    slotIndex={slotIndex}
+                    slotTime={slotTime}
                 />
             </div>
         )

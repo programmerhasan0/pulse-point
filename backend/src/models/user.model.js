@@ -40,7 +40,6 @@ const userSchema = new db.Schema({
             return this.role === 'doctor';
         },
     },
-    appointments: [],
     token: {
         type: String,
         required: false,

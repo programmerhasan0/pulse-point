@@ -84,15 +84,15 @@ export const postChangeActiveStatus = async (req, res) => {
 
 export const patchEditSpeciality = async (req, res) => {
     if (req.user?.role === 'admin') {
-        const { _id, title, slug } = req?.body;
+        const { _id, title, slug, department } = req?.body;
 
-        if (!(_id && title && slug)) {
+        if (!(_id && title && slug && department)) {
             return new ApiResponse(res).badRequest();
         }
 
         const updatedSpeciality = await Speciality.findByIdAndUpdate(
             _id,
-            { title, slug },
+            { title, slug, department },
             { new: true }
         );
 

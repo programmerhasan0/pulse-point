@@ -16,10 +16,10 @@ import {
 
 const adminRouter = Router();
 
-adminRouter.get('/view-specialities', getSpecialities);
-adminRouter.post('/add-speciality', postAddSpeciality);
+adminRouter.get('/speciality/get-all', getSpecialities);
+adminRouter.post('/speciality/add', postAddSpeciality);
+adminRouter.patch('/speciality/edit', patchEditSpeciality);
 adminRouter.post('/speciality-change-active-status', postChangeActiveStatus);
-adminRouter.patch('/edit-speciality', patchEditSpeciality);
 
 adminRouter.get('/doctor/get-all', getAdminDoctors);
 adminRouter.get('/doctor/:docId', getSingleDoctor);

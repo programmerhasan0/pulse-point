@@ -22,19 +22,27 @@ type PropTypes = {
     isAppointmentModalOpen: boolean;
     setIsAppointmentModalOpen: (isOpen: boolean) => void;
     docInfo: Doctor;
+    slotIndex: number;
+    slotTime: string;
 };
 
 const AppointmentModal: React.FC<PropTypes> = ({
     isAppointmentModalOpen,
     setIsAppointmentModalOpen,
     docInfo,
+    slotIndex,
+    slotTime,
 }) => {
     const { currencySymbol } = useContext(AppContext);
 
-    const { handleSubmit } = useForm<AppointmentFormInput>();
+    const { handleSubmit, register } = useForm<AppointmentFormInput>();
 
-    const handleAppointmentSubmit = (): void => {
-        setIsAppointmentModalOpen(false);
+    const handleAppointmentSubmit = (data: AppointmentFormInput): void => {
+        const date = new Date();
+        date.setDate(date.getDate() + slotIndex);
+        data.appointmentDate = date;
+        data.appointmentTime = slotTime;
+        console.log(JSON.stringify(data));
     };
 
     return (
@@ -43,6 +51,10 @@ const AppointmentModal: React.FC<PropTypes> = ({
                 className="max-w-md mx-auto"
                 onSubmit={handleSubmit(handleAppointmentSubmit)}
             >
+                <input
+                    type="hidden"
+                    {...register('docId', { value: docInfo._id })}
+                />
                 <div className="grid md:grid-cols-2 md:gap-6">
                     <div className="relative z-0 w-full mb-5 group">
                         <input
@@ -80,7 +92,6 @@ const AppointmentModal: React.FC<PropTypes> = ({
                 <div className="relative z-0 w-full mb-5 group">
                     <input
                         type="text"
-                        name="patientName"
                         id="docName"
                         className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer capitalize"
                         placeholder=""
@@ -97,8 +108,7 @@ const AppointmentModal: React.FC<PropTypes> = ({
                 <div className="relative z-0 w-full mb-5 group">
                     <input
                         type="text"
-                        name="patientName"
-                        id="docName"
+                        {...register('patientName', { required: true })}
                         className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer"
                         placeholder=""
                         required
@@ -113,8 +123,7 @@ const AppointmentModal: React.FC<PropTypes> = ({
                 <div className="relative z-0 w-full mb-5 group">
                     <input
                         type="text"
-                        name="docName"
-                        id="docName"
+                        {...register('patientAge', { required: true })}
                         className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer"
                         placeholder=""
                         required
@@ -134,7 +143,7 @@ const AppointmentModal: React.FC<PropTypes> = ({
                         Gender
                     </label>
                     <select
-                        id="countries"
+                        {...register('patientGender', { required: true })}
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                         <option value="m">Male</option>

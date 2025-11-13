@@ -8,6 +8,7 @@ import cors from 'cors';
 //routes
 import authRouter from './src/routes/auth.route.js';
 import adminRouter from './src/routes/admin.route.js';
+import appointmentRouter from './src/routes/appointment.route.js';
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.get('/', (req, res) =>
 // routes
 app.use('/api/auth/', authRouter);
 app.use('/api/admin/', authMiddleware, adminRouter);
+app.use('/api/appointment/', authMiddleware, appointmentRouter);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
