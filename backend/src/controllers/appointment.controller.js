@@ -153,7 +153,7 @@ export const putEditAppointmentDateTime = async (req, res) => {
 
     const updatedAppointment = await Appointment.findOneAndUpdate(
         updateQuery,
-        { date: new Date(date), time },
+        { date: new Date(date), time, status: 'rescheduled' },
         { new: true }
     );
 
@@ -169,4 +169,39 @@ export const putEditAppointmentDateTime = async (req, res) => {
     return new ApiResponse(res).unauthorized(
         "sorry! you're not allowed to perform this operation"
     );
+};
+
+export const putCompleteOrCancelAppointment = async (req, res) => {
+    const { _id } = req?.params;
+    const { status } = req?.body;
+
+    if (!(_id && status && isValidObjectId(_id))) {
+        return new ApiResponse(res).badRequest('missing fields or invalid id');
+    }
+
+    try {
+        const updatedAppointment = await Appointment.findOneAndUpdate(
+            { _id },
+            { status },
+            { new: true, user: req.user }
+        );
+        if (updatedAppointment._id) {
+            return new ApiResponse(res).success(
+                200,
+                'ok',
+                'appointment status updated',
+                updatedAppointment
+            );
+        }
+        return new ApiResponse(res).error(
+            404,
+            'not found',
+            'appointment not found'
+        );
+    } catch (error) {
+        return new ApiResponse(res).badRequest(
+            error.message,
+            'invalid operation'
+        );
+    }
 };

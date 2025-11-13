@@ -38,12 +38,40 @@ const appointmentSchema = new db.Schema(
         },
         status: {
             type: String,
-            enum: ['booked', 'completed', 'resheduled', 'cancelled'],
+            enum: ['booked', 'completed', 'rescheduled', 'cancelled'],
             required: true,
         },
     },
     { timestamps: true }
 );
+
+// checking before updating a status in appointment via middleware
+appointmentSchema.pre('findOneAndUpdate', async function (next) {
+    const update = this.getUpdate();
+    const user = this.getOptions().user;
+
+    const appointment = await this.model.findOne(this.getQuery());
+
+    if (appointment.status === 'completed') {
+        return next(new Error('completed status cannot be modified'));
+    }
+
+    if (
+        user.role === 'doctor' &&
+        appointment.doctor.toString() === user._id.toString()
+    ) {
+        return next();
+    }
+
+    if (
+        (user.role === 'admin' || user.role === 'staff') &&
+        update.status !== 'completed'
+    ) {
+        return next();
+    }
+
+    return next(new Error('unauthorized to change status'));
+});
 
 const Appointment = db.model('Appointment', appointmentSchema);
 
