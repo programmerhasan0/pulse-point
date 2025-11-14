@@ -99,12 +99,13 @@ export const patchDeactiveOrReactiveDoctor = async (req, res) => {
             _id,
             { isActive },
             { new: true }
-        );
+        ).select('-password -__v -token');
         if (isActive === updateActiveStatus.isActive) {
             return new ApiResponse(res).success(
                 200,
                 'ok',
-                'doctor status updated'
+                'doctor status updated',
+                updateActiveStatus
             );
         }
         return new ApiResponse(res).error();

@@ -201,7 +201,7 @@ export const postPasswordReset = async (req, res, next) => {
     );
 };
 
-export const patchDoctorUpdatePassword = async (req, res) => {
+export const patchDoctorStaffUpdatePassword = async (req, res) => {
     const { token, password, confirmPassword } = req?.body;
 
     if (!(token && password && confirmPassword)) {
@@ -218,13 +218,13 @@ export const patchDoctorUpdatePassword = async (req, res) => {
         .digest('hex');
 
     const passwordHash = await bcrypt.hash(password, +process.env.BCRYPT_SALT);
-    const doctor = await User.findOneAndUpdate(
+    const doctorOrStaff = await User.findOneAndUpdate(
         { token: genPwPrivateKey },
         { password: passwordHash, isActive: true, token: null },
         { new: true }
     );
 
-    if (doctor.password.length > 0) {
+    if (doctorOrStaff.password.length > 0) {
         return new ApiResponse(res).success(
             200,
             'ok',

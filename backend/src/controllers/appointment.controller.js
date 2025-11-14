@@ -84,21 +84,22 @@ export const getSingleAppointment = async (req, res) => {
 export const getAllAppointments = async (req, res) => {
     if (req.user?.role === 'admin' || req.user?.role === 'staff') {
         const appointments = await Appointment.find()
+            .select('-__v')
             .populate({
                 path: 'user',
-                select: '-password -__v -token',
+                select: '-password -__v -token -isActive',
             })
             .populate({
                 path: 'doctor',
-                select: '-password -__v',
-                populate: { path: 'speciality' },
+                select: '-password -__v -token -isActive',
+                populate: { path: 'speciality', select: '-__v -isActive' },
             });
 
         if (appointments.length > 0) {
             return new ApiResponse(res).success(
                 200,
                 'ok',
-                'Appointments found',
+                'Appointments found for admin/staff',
                 appointments
             );
         }
@@ -107,34 +108,68 @@ export const getAllAppointments = async (req, res) => {
             'not found',
             'sorry! no appointments found'
         );
-    } else {
-        return new ApiResponse(res).unauthorized(
-            'you are not allowed to perform this operation'
-        );
     }
-};
 
-export const getSingleDoctorAppointments = async (req, res) => {
     if (req.user?.role === 'doctor') {
-        const appointments = await Appointment.find({ doctor: req.user._id });
+        const appointments = await Appointment.find({ doctor: req.user._id })
+            .select('-__v')
+            .populate({
+                path: 'user',
+                select: '-password -__v -token -isActive',
+            })
+            .populate({
+                path: 'doctor',
+                select: '-password -__v -token -isActive',
+                populate: { path: 'speciality', select: '-__v -isActive' },
+            });
         if (appointments.length > 0) {
             return new ApiResponse(res).success(
                 200,
                 'ok',
-                'Appointments found',
+                'Appointments found for the doctor',
                 appointments
             );
+        } else {
+            return new ApiResponse(res).error(
+                404,
+                'not found',
+                'sorry! no appointments found of the doctor'
+            );
         }
-        return new ApiResponse(res).error(
-            404,
-            'not found',
-            'sorry! no appointments found of the doctor'
-        );
-    } else {
-        return new ApiResponse(res).unauthorized(
-            'you are not allowed to perform this operation'
-        );
     }
+
+    if (req.user?.role === 'patient') {
+        const appointments = await Appointment.find({ user: req.user._id })
+            .select('-__v')
+            .populate({
+                path: 'user',
+                select: '-password -__v -token -isActive',
+            })
+            .populate({
+                path: 'doctor',
+                select: '-password -__v -token -isActive -phone',
+                populate: { path: 'speciality', select: '-__v -isActive' },
+            });
+
+        if (appointments.length > 0) {
+            return new ApiResponse(res).success(
+                200,
+                'ok',
+                'appointments found for the patient',
+                appointments
+            );
+        } else {
+            return new ApiResponse(res).error(
+                404,
+                'not found',
+                "You didn't booked any appointments yet"
+            );
+        }
+    }
+
+    return new ApiResponse(res).unauthorized(
+        'you are not allowed to perform this operation'
+    );
 };
 
 export const putEditAppointmentDateTime = async (req, res) => {
@@ -154,7 +189,7 @@ export const putEditAppointmentDateTime = async (req, res) => {
     const updatedAppointment = await Appointment.findOneAndUpdate(
         updateQuery,
         { date: new Date(date), time, status: 'rescheduled' },
-        { new: true }
+        { new: true, user: req.user }
     );
 
     if (updatedAppointment) {
@@ -183,7 +218,7 @@ export const putCompleteOrCancelAppointment = async (req, res) => {
         const updatedAppointment = await Appointment.findOneAndUpdate(
             { _id },
             { status },
-            { new: true, user: req.user }
+            { new: true, runValidators: true, user: req.user }
         );
         if (updatedAppointment._id) {
             return new ApiResponse(res).success(

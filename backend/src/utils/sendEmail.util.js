@@ -57,7 +57,7 @@ export const sendPasswordResetMail = ({ name, email }, token) => {
         .catch((err) => console.log('email err', err));
 };
 
-export const sendCreatePasswordMail = ({ name, email }, token) => {
+export const sendCreatePasswordMail = ({ name, email, role }, token) => {
     const message = new SendSmtpEmail();
 
     message.subject = 'Create - Pulse Point';
@@ -67,8 +67,8 @@ export const sendCreatePasswordMail = ({ name, email }, token) => {
     };
     message.to = [{ name, email }];
     message.htmlContent = `
-    <p>Hi doctor, ${name} </p>
-    <h3>Password Create - Pulse Point</h3>
+    <p>Hi ${role === 'doctor' ? 'doctor' : 'prouded staff'}, ${name} </p>
+    <h3>Welcome to Pulse Point</h3>
     <hr/>
     <p>Please create your password by clicking <a href="${process.env.FRONTEND_URL}/doctor/create-password?token=${token}">here</a></p>
     `;
