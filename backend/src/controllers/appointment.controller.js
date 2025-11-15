@@ -240,3 +240,86 @@ export const putCompleteOrCancelAppointment = async (req, res) => {
         );
     }
 };
+
+export const putAddAppointmentNote = async (req, res) => {
+    if (req.user?.role === 'admin' || req.user?.role === 'staff') {
+        try {
+            const { _id } = req?.params;
+            const { note } = req?.body;
+
+            if (!(_id && isValidObjectId(_id))) {
+                return new ApiResponse(res).badRequest(
+                    'Please give a valid appointment id'
+                );
+            }
+            if (!note) {
+                return new ApiResponse(res).badRequest();
+            }
+
+            const updateNoteToAppointment = await Appointment.findByIdAndUpdate(
+                _id,
+                { $push: { notes: { user: req.user?._id, note } } },
+                { new: true }
+            );
+
+            if (updateNoteToAppointment._id) {
+                return new ApiResponse(res).success(
+                    200,
+                    'ok',
+                    'note updated',
+                    updateNoteToAppointment
+                );
+            }
+
+            return new ApiResponse(res).error(
+                404,
+                'not found',
+                'Sorry appointment not found'
+            );
+        } catch (error) {
+            return new ApiResponse(res).error(500, 'error', error.message);
+        }
+    }
+    return new ApiResponse(res).unauthorized(
+        'you are not allowed to perform this operation.'
+    );
+};
+
+export const deleteAppointmentNote = async (req, res) => {
+    const { appointmentId, noteId } = req.params;
+
+    if (
+        !(
+            appointmentId &&
+            noteId &&
+            isValidObjectId(appointmentId) &&
+            isValidObjectId(noteId)
+        )
+    ) {
+        return new ApiResponse(res).badRequest();
+    }
+
+    let query = { _id: appointmentId };
+
+    if (req.user?.role === 'staff')
+        query = { _id: appointmentId, 'notes.user': req.user._id };
+
+    const deletedNote = await Appointment.findOneAndUpdate(
+        query,
+        {
+            $pull: { notes: { _id: noteId } },
+        },
+        { new: true }
+    );
+
+    if (deletedNote._id) {
+        return new ApiResponse(res).success(
+            200,
+            'ok',
+            'note delated',
+            deletedNote
+        );
+    }
+
+    return new ApiResponse(res).error(404, 'not found', 'Note not found');
+};
