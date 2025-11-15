@@ -7,8 +7,17 @@ import { isValidObjectId } from 'mongoose';
 export const postAddDoctor = async (req, res) => {
     // TODO : add doctor picture upload functionality
     if (req.user?.role === 'admin') {
-        const { email, phone, name, age, gender, speciality, qualification } =
-            req?.body;
+        const {
+            email,
+            phone,
+            name,
+            age,
+            gender,
+            speciality,
+            qualification,
+            experience,
+            fees,
+        } = req?.body;
 
         if (
             !(
@@ -18,7 +27,9 @@ export const postAddDoctor = async (req, res) => {
                 age &&
                 gender &&
                 speciality &&
-                qualification
+                qualification &&
+                experience &&
+                fees
             )
         ) {
             return new ApiResponse(res).badRequest();
@@ -37,6 +48,8 @@ export const postAddDoctor = async (req, res) => {
             gender,
             speciality,
             qualification,
+            experience,
+            fees,
             role: 'doctor',
             isActive: false,
             token: pwSecretToken,
@@ -119,7 +132,6 @@ export const patchDeactiveOrReactiveDoctor = async (req, res) => {
 export const putEditDoctorInfo = async (req, res) => {
     // TODO : add doctor picture upload functionality
     if (req.user?.role === 'admin') {
-        console.log(req.body);
         const {
             _id,
             email,
@@ -129,6 +141,8 @@ export const putEditDoctorInfo = async (req, res) => {
             gender,
             speciality,
             qualification,
+            experience,
+            fees,
         } = req?.body;
 
         if (
@@ -140,7 +154,9 @@ export const putEditDoctorInfo = async (req, res) => {
                 age &&
                 gender &&
                 speciality &&
-                qualification
+                qualification &&
+                experience &&
+                fees
             )
         ) {
             return new ApiResponse(res).badRequest();
@@ -156,6 +172,8 @@ export const putEditDoctorInfo = async (req, res) => {
                 gender,
                 speciality,
                 qualification,
+                fees,
+                experience,
             },
             { new: true }
         );

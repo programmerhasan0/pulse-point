@@ -34,8 +34,20 @@ const userSchema = new db.Schema({
             return this.role === 'doctor';
         },
     },
+    experience: {
+        type: Number,
+        required: function () {
+            return this.role === 'doctor';
+        },
+    },
     qualification: {
         type: String,
+        required: function () {
+            return this.role === 'doctor';
+        },
+    },
+    fees: {
+        type: Number,
         required: function () {
             return this.role === 'doctor';
         },
@@ -48,6 +60,13 @@ const userSchema = new db.Schema({
         type: Boolean,
         default: true,
         required: true,
+    },
+    isConsulting: {
+        type: Boolean,
+        default: true,
+        required: function () {
+            return this.role === 'doctor';
+        },
     },
 });
 
