@@ -93,6 +93,10 @@ export const getAllAppointments = async (req, res) => {
                 path: 'doctor',
                 select: '-password -__v -token -isActive',
                 populate: { path: 'speciality', select: '-__v -isActive' },
+            })
+            .populate({
+                path: 'notes.user',
+                select: '_id name role',
             });
 
         if (appointments.length > 0) {

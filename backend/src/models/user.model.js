@@ -27,6 +27,12 @@ const userSchema = new db.Schema({
         enum: ['patient', 'doctor', 'admin', 'staff'],
         required: true,
     },
+    image: {
+        type: String,
+        required: function () {
+            return this.role === 'doctor';
+        },
+    },
     speciality: {
         type: db.Schema.Types.ObjectId,
         ref: 'Speciality',
@@ -58,12 +64,10 @@ const userSchema = new db.Schema({
     },
     isActive: {
         type: Boolean,
-        default: true,
         required: true,
     },
     isConsulting: {
         type: Boolean,
-        default: true,
         required: function () {
             return this.role === 'doctor';
         },

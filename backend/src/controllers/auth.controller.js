@@ -11,6 +11,7 @@ import {
     sendPasswordResetMail,
     sendWelcomeEmail,
 } from '../utils/sendEmail.util.js';
+import { isValidObjectId } from 'mongoose';
 
 export const postLogin = async (req, res, next) => {
     const { email, password } = req.body;
@@ -249,4 +250,90 @@ export const getDoctors = async (req, res) => {
     }
 
     return new ApiResponse(res).error(404, 'not found', 'Doctors not found');
+};
+
+export const getMe = async (req, res) => {
+    const me = await User.findById(req.user?._id).select(
+        '-__v -token -password'
+    );
+
+    return new ApiResponse(res).success(200, 'ok', 'user found', me);
+};
+
+export const putUpdateUser = async (req, res) => {
+    if (req.user?.role === 'patient') {
+        try {
+            const {
+                name,
+                phone,
+                gender,
+                age,
+                password,
+                confirmPassword,
+                isChangingPassword,
+            } = req.body;
+
+            if (!(name && phone && gender && age)) {
+                return new ApiResponse(res).badRequest();
+            }
+
+            if (isChangingPassword) {
+                if (password !== confirmPassword) {
+                    return new ApiResponse(res).badRequest(
+                        "password and confirm password doesn't match."
+                    );
+                }
+
+                const passwordHash = await bcrypt.hash(
+                    password,
+                    +process.env.BCRYPT_SALT
+                );
+
+                const updatedUser = await User.findByIdAndUpdate(
+                    req.user?._id,
+                    { name, phone, gender, age, password: passwordHash },
+                    { new: true }
+                ).select('-__v -token -password');
+
+                if (updatedUser._id) {
+                    return new ApiResponse(res).success(
+                        200,
+                        'ok',
+                        'information updated',
+                        updatedUser
+                    );
+                }
+                return new ApiResponse(res).error(
+                    404,
+                    'not found',
+                    'user not found'
+                );
+            }
+
+            const updatedUser = await User.findByIdAndUpdate(
+                req.user?._id,
+                { name, phone, gender, age },
+                { new: true }
+            ).select('-__v -token -password');
+
+            if (updatedUser._id) {
+                return new ApiResponse(res).success(
+                    200,
+                    'ok',
+                    'information updated with password',
+                    updatedUser
+                );
+            }
+            return new ApiResponse(res).error(
+                404,
+                'not found',
+                'user not found'
+            );
+        } catch (error) {
+            return new ApiResponse(res).error(500, 'error', error.message);
+        }
+    }
+    return new ApiResponse(res).unauthorized(
+        'you are not allowed to perform this operation.'
+    );
 };
