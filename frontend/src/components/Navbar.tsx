@@ -1,12 +1,23 @@
 import { assets } from '@assets/assets_frontend/assets';
-import { useState } from 'react';
+import { AppContext } from '@context/contexts';
+import { useContext, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
     const navigate = useNavigate();
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
-    const [token, setToken] = useState<boolean>(true);
+    const {
+        user: { setUser },
+        isLoggedIn: { isLoggedIn, setIsLoggedIn },
+    } = useContext(AppContext);
+
+    const logOut = () => {
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
+        setUser(null);
+    };
+
     return (
         <div className="flex items-center justify-between text-sm py-4 mb-5 border-b border-gray-400">
             <NavLink to="/">
@@ -36,12 +47,12 @@ const Navbar: React.FC = () => {
             </ul>
 
             <div className="flex items-center gap-4">
-                {token ? (
+                {isLoggedIn ? (
                     <>
                         {/* Profile Menu area started  */}
                         <div
                             className="flex items-center gap-2 cursor-pointer relative"
-                            onClick={() => setShowProfileMenu(prev => !prev)}
+                            onClick={() => setShowProfileMenu((prev) => !prev)}
                         >
                             <img
                                 className="w-8 rounded-full"
@@ -74,9 +85,7 @@ const Navbar: React.FC = () => {
                                         </p>
                                         <p
                                             className="hover:text-black cursor-pointer"
-                                            onClick={() =>
-                                                setToken(() => false)
-                                            }
+                                            onClick={logOut}
                                         >
                                             Logout
                                         </p>
@@ -89,9 +98,9 @@ const Navbar: React.FC = () => {
                 ) : (
                     <button
                         onClick={() => navigate('/login')}
-                        className="bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block cursor-pointer"
+                        className="bg-primary text-white px-8 py-3  rounded-full font-light hidden md:block cursor-pointer"
                     >
-                        Create Account
+                        Login | Sign Up
                     </button>
                 )}
                 <img
@@ -140,6 +149,17 @@ const Navbar: React.FC = () => {
                                 Contact
                             </p>
                         </NavLink>
+
+                        {isLoggedIn === false && (
+                            <NavLink
+                                onClick={() => setShowMenu(false)}
+                                to="/login"
+                            >
+                                <p className="px-4 py-2 rounded inline-block">
+                                    Login / Create Account
+                                </p>
+                            </NavLink>
+                        )}
                     </ul>
                 </div>
             </div>

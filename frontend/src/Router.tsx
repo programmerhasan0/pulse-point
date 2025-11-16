@@ -9,11 +9,14 @@ import Login from '@pages/Login';
 import MyAppointments from '@pages/MyAppointments';
 import MyProfile from '@pages/MyProfile';
 import { Route, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import PrivateRoute from '@components/PrivateRoute';
 
 const Router: React.FC = () => {
     return (
         <div className="mx-4 sm:mx-[10%]">
             <Navbar />
+            <ToastContainer />
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/doctors" element={<Doctors />} />
@@ -21,7 +24,10 @@ const Router: React.FC = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/my-profile" element={<MyProfile />} />
+                <Route
+                    path="/my-profile"
+                    element={<PrivateRoute element={<MyProfile />} />}
+                />
                 <Route path="/my-appointments" element={<MyAppointments />} />
                 <Route path="/appointment/:docId" element={<Appointments />} />
             </Routes>

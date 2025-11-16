@@ -9,7 +9,11 @@ export type AppointmentFormInput = {
 };
 
 export type RegisterLoginFormInput = {
-    fullName?: string;
+    name?: string;
+    age?: number;
+    gender: 'm' | 'f' | 't';
     email: string;
     password: string;
+    confirmPassword?: string;
+    phone?: string;
 };

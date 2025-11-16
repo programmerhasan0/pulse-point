@@ -14,45 +14,63 @@ import {
 import { isValidObjectId } from 'mongoose';
 
 export const postLogin = async (req, res, next) => {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    if (!(email, password)) {
-        return new ApiResponse(res).badRequest();
-    }
+        if (!(email, password)) {
+            return new ApiResponse(res).badRequest();
+        }
 
-    const user = await User.findOne({ email });
-    if (user) {
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
-
-        if (isPasswordMatch) {
-            const token = jwt.sign(
-                {
-                    _id: user._id.toString(),
-                    email: user.email,
-                    name: user.name,
-                },
-                process.env.JWT_PASS,
-                { expiresIn: '1d' }
+        const user = await User.findOne({ email });
+        if (user) {
+            const isPasswordMatch = await bcrypt.compare(
+                password,
+                user.password
             );
-            return new ApiResponse(res).success(
-                200,
-                'ops success',
-                'Login Successful',
-                { token }
-            );
+
+            if (isPasswordMatch) {
+                const token = jwt.sign(
+                    {
+                        _id: user._id.toString(),
+                        email: user.email,
+                        name: user.name,
+                    },
+                    process.env.JWT_PASS,
+                    { expiresIn: '1d' }
+                );
+                return new ApiResponse(res).success(
+                    200,
+                    'ops success',
+                    'Login Successful',
+                    {
+                        token,
+                        user: {
+                            _id: user._id,
+                            name: user.name,
+                            age: user.age,
+                            gender: user.gender,
+                            email: user.email,
+                            phone: user.phone,
+                            role: user.role,
+                        },
+                    }
+                );
+            } else {
+                return new ApiResponse(res).error(
+                    401,
+                    "doesn't match",
+                    "passwords doesn't match"
+                );
+            }
         } else {
             return new ApiResponse(res).error(
-                401,
-                "doesn't match",
-                "passwords doesn't match"
+                400,
+                'user not found',
+                'User not found with the corresponding email'
             );
         }
-    } else {
-        return new ApiResponse(res).error(
-            400,
-            'user not found',
-            'User not found with the corresponding email'
-        );
+    } catch (error) {
+        return new ApiResponse(res).error(500, 'error', error.message);
     }
 };
 
@@ -103,6 +121,7 @@ export const postCreateAccount = async (req, res, next) => {
             age,
             phone,
             role: 'patient',
+            isActive: true,
         });
 
         const savedUser = await newUser.save();

@@ -1,33 +1,20 @@
 import { assets } from '@assets/assets_frontend/assets';
 import { User } from '@definitions/user';
-import { correctDateIdex } from '@utils/date';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { genderMap } from '@utils/genderMap';
+import { AppContext } from '@context/contexts';
 
 const MyProfile: React.FC = () => {
-    const [userData, setUserData] = useState<User>({
-        name: 'Edward Vincent',
-        image: assets.profile_pic,
-        email: 'programmerhasan0@gmail.com',
-        phone: '+8801728-548-385',
-        address: {
-            line1: 'House 4063, Mominpara',
-            line2: 'Tetulia, Panchagarh.',
-        },
-        gender: 'm',
-        dob: correctDateIdex(2004, 12, 30),
-    });
+    const {
+        user: { user },
+    } = useContext(AppContext);
     const [isEdit, setIsEdit] = useState<boolean>(false);
     const { register, handleSubmit } = useForm<User>();
 
     const handleEditFormSubmit = (data: User): void => {
-        setUserData((prev) => ({
-            ...prev,
-            ...data,
-            dob: typeof data.dob === 'string' ? new Date(data.dob) : data.dob,
-        }));
         setIsEdit(false);
+        console.log(data);
     };
 
     return (
@@ -36,19 +23,23 @@ const MyProfile: React.FC = () => {
             className="max-w-lg flex flex-col gap-2 text-sm "
         >
             <div>
-                <img className="w-36 rounded " src={userData.image} alt="" />
+                <img
+                    className="w-36 rounded "
+                    src={assets.profile_pic}
+                    alt=""
+                />
                 {isEdit ? (
                     <input
                         type="text"
                         {...register('name', {
                             required: true,
-                            value: userData.name,
+                            value: user?.name,
                         })}
                         className="bg-gray-50 text-3xl font-medium max-w-60 mt-4"
                     />
                 ) : (
                     <p className="font-medium text-3xl text-neutral-800 mt-4">
-                        {userData.name}
+                        {user?.name}
                     </p>
                 )}
                 <hr className="bg-zinc-400 h-[1px] border-none" />
@@ -58,19 +49,19 @@ const MyProfile: React.FC = () => {
                     </p>
                     <div className="grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700">
                         <p>Email Id: </p>
-                        <p className="text-primary">{userData.email}</p>
+                        <p className="text-primary">{user?.email}</p>
                         <p className="font-medium">Phone: </p>
                         {isEdit ? (
                             <input
                                 type="text"
                                 {...register('phone', {
                                     required: true,
-                                    value: userData.phone,
+                                    value: user?.phone,
                                 })}
                                 className="bg-gray-50 max-w-52"
                             />
                         ) : (
-                            <p className="text-primary">{userData.phone}</p>
+                            <p className="text-primary">{user?.phone}</p>
                         )}
                         <p className="font-medium ">Address: </p>
                         {isEdit ? (
@@ -79,7 +70,7 @@ const MyProfile: React.FC = () => {
                                     type="text"
                                     {...register('address.line1', {
                                         required: true,
-                                        value: userData.address.line1,
+                                        value: 'House 4063, Mominpara',
                                     })}
                                     className="bg-gray-50 "
                                 />
@@ -88,16 +79,16 @@ const MyProfile: React.FC = () => {
                                     type="text"
                                     {...register('address.line2', {
                                         required: true,
-                                        value: userData.address.line2,
+                                        value: 'Tetulia, Panchagarh.',
                                     })}
                                     className="bg-gray-50 "
                                 />
                             </p>
                         ) : (
                             <p className="text-gray-500 ">
-                                {userData.address.line1}
+                                House 4063, Mominpara
                                 <br />
-                                {userData.address.line2}
+                                Tetulia, Panchagarh.
                             </p>
                         )}
                     </div>
@@ -113,7 +104,7 @@ const MyProfile: React.FC = () => {
                                 className="max-w-20 bg-gray-100"
                                 {...register('gender', {
                                     required: true,
-                                    value: userData.gender,
+                                    value: user?.gender,
                                 })}
                             >
                                 <option value="m">Male</option>
@@ -122,23 +113,21 @@ const MyProfile: React.FC = () => {
                             </select>
                         ) : (
                             <p className="text-gray-400">
-                                {genderMap(userData.gender)}
+                                {genderMap(user?.gender || 'm')}
                             </p>
                         )}
-                        <p className="font-medium">Birthday:</p>
+                        <p className="font-medium">Age: </p>
                         {isEdit ? (
                             <input
-                                type="date"
-                                {...register('dob', {
+                                type="number"
+                                {...register('age', {
                                     required: true,
+                                    value: user?.age,
                                 })}
                                 className="max-w-28 bg-gray-100 "
-                                defaultValue={`${userData.dob.getFullYear()}-${userData.dob.getMonth() + 1}-${userData.dob.getDate()}`}
                             />
                         ) : (
-                            <p className="text-gray-400">
-                                {userData.dob.toLocaleDateString('en-GB')}
-                            </p>
+                            <p className="text-gray-400">{user?.age} Yrs</p>
                         )}
                     </div>
                 </div>
