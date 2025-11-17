@@ -10,6 +10,8 @@ type Props = {
 };
 
 const AppContextProvider: React.FC<Props> = ({ children }) => {
+    const token = localStorage.getItem('token');
+
     const currencySymbol: string = '$';
     const [user, setUser] = useState<User | null>(null);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -22,11 +24,10 @@ const AppContextProvider: React.FC<Props> = ({ children }) => {
         user: { user, setUser },
         isLoggedIn: { isLoggedIn, setIsLoggedIn },
         isAuthLoading: { isAuthLoading, setIsAuthLoading },
+        token,
     };
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-
         if (!token) {
             setIsAuthLoading(false);
             return;
@@ -50,7 +51,7 @@ const AppContextProvider: React.FC<Props> = ({ children }) => {
                     setIsAuthLoading(false);
                 });
         }
-    }, []);
+    }, [token]);
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

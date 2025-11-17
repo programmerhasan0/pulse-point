@@ -4,18 +4,56 @@ import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { genderMap } from '@utils/genderMap';
 import { AppContext } from '@context/contexts';
+import FormErrorMessage from '@components/FormErrorMessage';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const MyProfile: React.FC = () => {
     const {
-        user: { user },
+        user: { user, setUser },
+        token,
     } = useContext(AppContext);
     const [isEdit, setIsEdit] = useState<boolean>(false);
-    const { register, handleSubmit } = useForm<User>();
+    const [isFormLoading, setIsFormLoading] = useState<boolean>(false);
+
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors },
+    } = useForm<User>();
+
+    const password = watch('password');
+    const confirmPassword = watch('confirmPassword');
 
     const handleEditFormSubmit = (data: User): void => {
-        setIsEdit(false);
+        setIsFormLoading(true);
+        if (password && confirmPassword && password === confirmPassword) {
+            data.isChangingPassword = true;
+        }
+
+        axios
+            .put(
+                `${import.meta.env.VITE_BACKEND_URL}/auth/update-profile`,
+                data,
+                { headers: { Authorization: token } }
+            )
+            .then((res) => {
+                toast.success(res.data.message);
+                setUser(res.data.data);
+                setIsEdit(false);
+            })
+            .catch((err) => {
+                toast.error(err.response.data.message);
+            })
+            .finally(() => {
+                setIsFormLoading(false);
+            });
+
         console.log(data);
     };
+
+    const passwordRequired = !!password || !!confirmPassword;
 
     return (
         <form
@@ -63,34 +101,6 @@ const MyProfile: React.FC = () => {
                         ) : (
                             <p className="text-primary">{user?.phone}</p>
                         )}
-                        <p className="font-medium ">Address: </p>
-                        {isEdit ? (
-                            <p>
-                                <input
-                                    type="text"
-                                    {...register('address.line1', {
-                                        required: true,
-                                        value: 'House 4063, Mominpara',
-                                    })}
-                                    className="bg-gray-50 "
-                                />
-                                <br />
-                                <input
-                                    type="text"
-                                    {...register('address.line2', {
-                                        required: true,
-                                        value: 'Tetulia, Panchagarh.',
-                                    })}
-                                    className="bg-gray-50 "
-                                />
-                            </p>
-                        ) : (
-                            <p className="text-gray-500 ">
-                                House 4063, Mominpara
-                                <br />
-                                Tetulia, Panchagarh.
-                            </p>
-                        )}
                     </div>
                 </div>
                 <div>
@@ -131,12 +141,52 @@ const MyProfile: React.FC = () => {
                         )}
                     </div>
                 </div>
+                {isEdit && (
+                    <div>
+                        <p className="text-neutral-500 underline mt-3">
+                            CHANGE PASSWORD
+                        </p>
+                        <div className="grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700">
+                            <p className="font-medium">Password:</p>
+                            <input
+                                type="password"
+                                {...register('password', {
+                                    required: passwordRequired,
+                                    pattern: passwordRequired
+                                        ? {
+                                              value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).{6,}$/,
+                                              message:
+                                                  'Password must have at least 1 uppercase, 1 lowercase, 1 special char & minimum 6 characters.',
+                                          }
+                                        : undefined,
+                                })}
+                                className="max-w-28 bg-gray-100 "
+                            />
+                            <p className="font-medium">Confirm Password: </p>
+                            <input
+                                type="password"
+                                {...register('confirmPassword', {
+                                    required: passwordRequired,
+                                    validate: passwordRequired
+                                        ? (value) =>
+                                              value === password ||
+                                              'Passwords do not match.'
+                                        : undefined,
+                                })}
+                                className="max-w-28 bg-gray-100 "
+                            />
+                        </div>
+                    </div>
+                )}
+                <FormErrorMessage name="password" errors={errors} />
+                <FormErrorMessage name="confirmPassword" errors={errors} />
                 <div className="mt-10">
                     {isEdit ? (
                         <input
-                            className="border border-primary px-8 py-2 rounded-full cursor-pointer hover:bg-primary hover:text-white transition-all duration-200 "
+                            className="border border-primary px-8 py-2 rounded-full cursor-pointer hover:bg-primary hover:text-white transition-all duration-200 disabled:cursor-not-allowed"
+                            disabled={isFormLoading}
                             type="submit"
-                            value="Save information"
+                            value="Save Information"
                         />
                     ) : (
                         <button

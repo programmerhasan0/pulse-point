@@ -318,7 +318,7 @@ export const putUpdateUser = async (req, res) => {
                     return new ApiResponse(res).success(
                         200,
                         'ok',
-                        'information updated',
+                        'information updated with password',
                         updatedUser
                     );
                 }
@@ -339,7 +339,7 @@ export const putUpdateUser = async (req, res) => {
                 return new ApiResponse(res).success(
                     200,
                     'ok',
-                    'information updated with password',
+                    'information updated.',
                     updatedUser
                 );
             }
@@ -349,7 +349,12 @@ export const putUpdateUser = async (req, res) => {
                 'user not found'
             );
         } catch (error) {
-            return new ApiResponse(res).error(500, 'error', error.message);
+            if (error.code === 11000 && error.keyPattern?.phone) {
+                return new ApiResponse(res).badRequest(
+                    'Phone number already exists.'
+                );
+            }
+            return new ApiResponse(res).error();
         }
     }
     return new ApiResponse(res).unauthorized(

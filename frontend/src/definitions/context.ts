@@ -20,4 +20,5 @@ export interface AppContextValue {
         isAuthLoading: boolean;
         setIsAuthLoading: Dispatch<SetStateAction<boolean>>;
     };
+    token: string | null;
 }

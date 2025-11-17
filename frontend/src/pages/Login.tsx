@@ -66,6 +66,7 @@ const Login: React.FC = () => {
                 })
                 .finally(() => setIsFormLoading(false));
         }
+        return;
     };
 
     useEffect(() => {
