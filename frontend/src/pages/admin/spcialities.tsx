@@ -4,6 +4,7 @@ import { Speciality } from '@definitions/utils';
 import axios from 'axios';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Specialities: React.FC = () => {
     const {
@@ -15,6 +16,8 @@ const Specialities: React.FC = () => {
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
     const [selectedSpeciality, setSelectedSpecility] = useState<Speciality>();
     const [isEdit, setIsEdit] = useState<boolean>(false);
+    const [isChangeStatusLoading, setIsChangeStatusLoading] =
+        useState<boolean>(false);
 
     const fetchSpecialities = useCallback(() => {
         axios
@@ -33,6 +36,32 @@ const Specialities: React.FC = () => {
                 console.log('error happend', err);
             });
     }, [token]);
+
+    const specialityChangeActiveStatus = (_id: string, status: boolean) => {
+        if (confirm('Sure to change status?')) {
+            setIsChangeStatusLoading(true);
+            axios
+                .put(
+                    `${import.meta.env.VITE_BACKEND_URL}/admin/speciality-change-active-status`,
+                    { _id, active: status },
+                    {
+                        headers: {
+                            Authorization: token,
+                        },
+                    }
+                )
+                .then((res) => {
+                    toast.success(res.data.message);
+                    fetchSpecialities();
+                })
+                .catch((err) => {
+                    toast.error(err.response.data.message);
+                })
+                .finally(() => {
+                    setIsChangeStatusLoading(false);
+                });
+        }
+    };
 
     useEffect(() => {
         fetchSpecialities();
@@ -149,10 +178,19 @@ const Specialities: React.FC = () => {
                                                 Edit
                                             </button>
                                             <button
-                                                className="px-2 py-1 rounded-md text-sm bg-red-50 text-red-700 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-200"
+                                                className={`px-2 py-1 rounded-md text-sm cursor-pointer ${speciality.isActive ? ' bg-red-50 text-red-700 hover:bg-red-100 focus:ring-red-200' : 'bg-green-50 text-green-700 hover:bg-green-100 focus:ring-green-200'} focus:outline-none focus:ring-2 disabled:cursor-not-allowed`}
                                                 aria-label={`Delete ${speciality.title}`}
+                                                disabled={isChangeStatusLoading}
+                                                onClick={() =>
+                                                    specialityChangeActiveStatus(
+                                                        speciality._id,
+                                                        !speciality.isActive
+                                                    )
+                                                }
                                             >
-                                                Delete
+                                                {speciality.isActive
+                                                    ? 'Deactive'
+                                                    : 'Reactive'}
                                             </button>
                                         </div>
                                     </td>

@@ -11,7 +11,7 @@ import MyProfile from '@pages/MyProfile';
 import { Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import PrivateRoute from '@components/PrivateRoute';
-import Specialities from '@pages/admin/spcialities';
+import Specialities from '@pages/admin/Spcialities';
 
 const Router: React.FC = () => {
     return (

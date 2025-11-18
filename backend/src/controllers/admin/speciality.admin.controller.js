@@ -64,7 +64,7 @@ export const postAddSpeciality = async (req, res) => {
     }
 };
 
-export const postChangeActiveStatus = async (req, res) => {
+export const putChangeActiveStatus = async (req, res) => {
     if (req.user?.role === 'admin') {
         const { _id, active } = req?.body;
 

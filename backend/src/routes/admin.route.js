@@ -5,7 +5,7 @@ import {
     getSpecialities,
     patchEditSpeciality,
     postAddSpeciality,
-    postChangeActiveStatus,
+    putChangeActiveStatus,
 } from '../controllers/admin/speciality.admin.controller.js';
 
 // doctor controller imports
@@ -32,7 +32,7 @@ const adminRouter = Router();
 adminRouter.get('/speciality/get-all', getSpecialities);
 adminRouter.post('/speciality/add', postAddSpeciality);
 adminRouter.patch('/speciality/edit', patchEditSpeciality);
-adminRouter.post('/speciality-change-active-status', postChangeActiveStatus);
+adminRouter.put('/speciality-change-active-status', putChangeActiveStatus);
 
 // admin doctor routes
 adminRouter.get('/doctor/get-all', getAdminDoctors);
