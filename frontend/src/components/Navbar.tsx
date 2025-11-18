@@ -8,7 +8,7 @@ const Navbar: React.FC = () => {
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
     const {
-        user: { setUser },
+        user: { setUser, user },
         isLoggedIn: { isLoggedIn, setIsLoggedIn },
     } = useContext(AppContext);
 
@@ -83,6 +83,30 @@ const Navbar: React.FC = () => {
                                         >
                                             My Appointments
                                         </p>
+                                        {user?.role === 'admin' && (
+                                            <>
+                                                <p
+                                                    className="hover:text-black cursor-pointer"
+                                                    onClick={() =>
+                                                        navigate(
+                                                            'admin/doctors'
+                                                        )
+                                                    }
+                                                >
+                                                    Doctors
+                                                </p>
+                                                <p
+                                                    className="hover:text-black cursor-pointer"
+                                                    onClick={() =>
+                                                        navigate(
+                                                            'admin/specialities'
+                                                        )
+                                                    }
+                                                >
+                                                    Specialities
+                                                </p>
+                                            </>
+                                        )}
                                         <p
                                             className="hover:text-black cursor-pointer"
                                             onClick={logOut}

@@ -25,30 +25,40 @@ export const getSpecialities = async (req, res) => {
 
 export const postAddSpeciality = async (req, res) => {
     if (req.user?.role === 'admin') {
-        const { title, slug, department } = req?.body;
+        try {
+            const { title, slug, department } = req?.body;
 
-        if (!(title && slug && department)) {
-            return new ApiResponse(res).badRequest();
+            if (!(title && slug && department)) {
+                return new ApiResponse(res).badRequest();
+            }
+
+            const speciality = new Speciality({
+                title,
+                slug,
+                department,
+                isActive: true,
+            });
+
+            const saveSpeciality = await speciality.save();
+
+            if (saveSpeciality._id) {
+                return new ApiResponse(res).success(
+                    200,
+                    'ok',
+                    'Speciality created'
+                );
+            }
+            return new ApiResponse(res).error();
+        } catch (err) {
+            if (err.code === 11000 && err.keyPattern?.slug) {
+                return new ApiResponse(res).error(
+                    401,
+                    'exists',
+                    'Slug Already Exists'
+                );
+            }
+            return new ApiResponse(res).error();
         }
-
-        const speciality = new Speciality({
-            title,
-            slug,
-            department,
-            isActive: true,
-        });
-
-        const saveSpeciality = await speciality.save();
-
-        if (saveSpeciality._id) {
-            return new ApiResponse(res).success(
-                200,
-                'ok',
-                'Speciality created'
-            );
-        }
-
-        return new ApiResponse(res).error();
     } else {
         return new ApiResponse(res).unauthorized();
     }

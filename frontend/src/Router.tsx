@@ -11,6 +11,7 @@ import MyProfile from '@pages/MyProfile';
 import { Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import PrivateRoute from '@components/PrivateRoute';
+import Specialities from '@pages/admin/spcialities';
 
 const Router: React.FC = () => {
     return (
@@ -30,6 +31,12 @@ const Router: React.FC = () => {
                 />
                 <Route path="/my-appointments" element={<MyAppointments />} />
                 <Route path="/appointment/:docId" element={<Appointments />} />
+                <Route path="/admin">
+                    <Route
+                        path="specialities"
+                        element={<PrivateRoute element={<Specialities />} />}
+                    />
+                </Route>
             </Routes>
             <Footer />
         </div>
