@@ -5,68 +5,80 @@ import ApiResponse from '../../utils/ApiResponse.util.js';
 import { isValidObjectId } from 'mongoose';
 
 export const postAddDoctor = async (req, res) => {
-    // TODO : add doctor picture upload functionality
     if (req.user?.role === 'admin') {
-        const {
-            email,
-            phone,
-            name,
-            age,
-            gender,
-            speciality,
-            qualification,
-            experience,
-            fees,
-        } = req?.body;
+        console.log(req.file);
+        try {
+            const {
+                email,
+                phone,
+                name,
+                age,
+                gender,
+                speciality,
+                qualification,
+                experience,
+                fees,
+            } = req?.body;
 
-        if (
-            !(
-                email &&
-                phone &&
-                name &&
-                age &&
-                gender &&
-                speciality &&
-                qualification &&
-                experience &&
-                fees
-            )
-        ) {
-            return new ApiResponse(res).badRequest();
+            if (
+                !(
+                    email &&
+                    phone &&
+                    name &&
+                    age &&
+                    gender &&
+                    speciality &&
+                    qualification &&
+                    experience &&
+                    fees
+                )
+            ) {
+                return new ApiResponse(res).badRequest();
+            }
+            const pwPublicToken = crypto.randomBytes(32).toString('hex');
+            const pwSecretToken = crypto
+                .createHash('sha256')
+                .update(pwPublicToken)
+                .digest('hex');
+
+            const doctor = new User({
+                name,
+                age,
+                phone,
+                email,
+                gender,
+                speciality,
+                qualification,
+                experience,
+                fees,
+                role: 'doctor',
+                isActive: false,
+                token: pwSecretToken,
+                image: req.file.path,
+                isConsulting: true,
+            });
+
+            const savedDoctor = await doctor.save();
+
+            if (savedDoctor._id) {
+                sendCreatePasswordMail(savedDoctor, pwPublicToken);
+                return new ApiResponse(res).success(
+                    200,
+                    'ok',
+                    'Doctor creation success! a password creation list has been sent to his/her email'
+                );
+            }
+
+            return new ApiResponse(res).error();
+        } catch (error) {
+            console.log(error);
+            if (error.code === 11000) {
+                return new ApiResponse(res).badRequest(
+                    'Email or Phone already exists.'
+                );
+            }
+            return new ApiResponse(res).error();
         }
-        const pwPublicToken = crypto.randomBytes(32).toString('hex');
-        const pwSecretToken = crypto
-            .createHash('sha256')
-            .update(pwPublicToken)
-            .digest('hex');
-
-        const doctor = new User({
-            name,
-            age,
-            phone,
-            email,
-            gender,
-            speciality,
-            qualification,
-            experience,
-            fees,
-            role: 'doctor',
-            isActive: false,
-            token: pwSecretToken,
-        });
-
-        const savedDoctor = await doctor.save();
-
-        if (savedDoctor._id) {
-            sendCreatePasswordMail(savedDoctor, pwPublicToken);
-            return new ApiResponse(res).success(
-                200,
-                'ok',
-                'Doctor creation success! a password creation list has been sent to his/her email'
-            );
-        }
-
-        return new ApiResponse(res).error();
     } else {
         return new ApiResponse(res).unauthorized(
             'You are not authorized to perform this operation.'
@@ -77,8 +89,8 @@ export const postAddDoctor = async (req, res) => {
 export const getAdminDoctors = async (req, res) => {
     if (req.user?.role === 'admin' || req.user?.role === 'staff') {
         const doctors = await User.find({ role: 'doctor' })
-            .select('-password -role')
-            .populate('speciality');
+            .select('-password -token -__v')
+            .populate({ path: 'speciality', select: '-__v' });
 
         if (doctors.length > 0) {
             return new ApiResponse(res).success(
@@ -132,6 +144,7 @@ export const patchDeactiveOrReactiveDoctor = async (req, res) => {
 export const putEditDoctorInfo = async (req, res) => {
     // TODO : add doctor picture upload functionality
     if (req.user?.role === 'admin') {
+        console.log(req.body);
         const {
             _id,
             email,
@@ -162,21 +175,34 @@ export const putEditDoctorInfo = async (req, res) => {
             return new ApiResponse(res).badRequest();
         }
 
-        const updateDoctor = await User.findByIdAndUpdate(
-            _id,
-            {
-                name,
-                age,
-                phone,
-                email,
-                gender,
-                speciality,
-                qualification,
-                fees,
-                experience,
-            },
-            { new: true }
-        );
+        const updatedData = req.file?.path
+            ? {
+                  name,
+                  age,
+                  phone,
+                  email,
+                  gender,
+                  speciality,
+                  qualification,
+                  fees,
+                  experience,
+                  image: req.file.path,
+              }
+            : {
+                  name,
+                  age,
+                  phone,
+                  email,
+                  gender,
+                  speciality,
+                  qualification,
+                  fees,
+                  experience,
+              };
+
+        const updateDoctor = await User.findByIdAndUpdate(_id, updatedData, {
+            new: true,
+        });
 
         if (updateDoctor._id) {
             return new ApiResponse(res).success(

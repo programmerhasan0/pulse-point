@@ -107,7 +107,7 @@ const CreateSpecialityModal: React.FC<PropTypes> = ({
                         <div className="relative z-0 w-full mb-5 group">
                             <input
                                 type="text"
-                                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer capitalize"
+                                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none  dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer capitalize"
                                 placeholder=""
                                 {...register('title', {
                                     required: true,
@@ -124,7 +124,7 @@ const CreateSpecialityModal: React.FC<PropTypes> = ({
                         <div className="relative z-0 w-full mb-5 group">
                             <input
                                 type="text"
-                                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer capitalize"
+                                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none  dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer capitalize"
                                 placeholder=""
                                 {...register('department', {
                                     required: true,
@@ -138,7 +138,7 @@ const CreateSpecialityModal: React.FC<PropTypes> = ({
                         <div className="relative z-0 w-full mb-5 group">
                             <input
                                 type="text"
-                                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer"
+                                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-primary focus:outline-none focus:ring-0 focus:border-primary peer"
                                 placeholder=""
                                 {...register('slug', {
                                     required: true,
@@ -155,6 +155,8 @@ const CreateSpecialityModal: React.FC<PropTypes> = ({
                         >
                             {isFormLoading ? (
                                 <ClipLoader color="#FFFFFF" size={10} />
+                            ) : isEdit ? (
+                                'Edit'
                             ) : (
                                 'Add'
                             )}

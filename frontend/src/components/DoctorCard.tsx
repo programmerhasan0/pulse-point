@@ -1,6 +1,7 @@
 import React from 'react';
 import { Doctor } from '@definitions/assets';
 import { useNavigate } from 'react-router-dom';
+import { assets } from '@assets/assets_frontend/assets';
 
 type Props = {
     doctor: Doctor;
@@ -17,7 +18,11 @@ const DoctorCard: React.FC<Props> = ({ doctor }: Props) => {
                 scrollTo(0, 0);
             }}
         >
-            <img src={doctor.image} className="bg-blue-50" alt="" />
+            <img
+                src={doctor.image || assets.profile_pic}
+                className="bg-blue-50"
+                alt=""
+            />
             <div className="p-4">
                 <div className="flex items-center gap-2 text-sm text-center text-green-500">
                     <p className="w-2 h-2 bg-green-500 rounded-full"></p>
@@ -27,7 +32,7 @@ const DoctorCard: React.FC<Props> = ({ doctor }: Props) => {
                     {doctor.name}
                 </p>
                 <p className="text-gray-600 text-sm capitalize">
-                    {doctor.speciality}
+                    {doctor.speciality.title}
                 </p>
             </div>
         </div>

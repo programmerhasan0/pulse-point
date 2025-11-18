@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import upload from '../utils/upload.js';
 
 // speciality controller imports
 import {
@@ -37,9 +38,9 @@ adminRouter.put('/speciality-change-active-status', putChangeActiveStatus);
 // admin doctor routes
 adminRouter.get('/doctor/get-all', getAdminDoctors);
 adminRouter.get('/doctor/:docId', getSingleDoctor);
-adminRouter.post('/doctor/add', postAddDoctor);
+adminRouter.post('/doctor/add', upload.single('image'), postAddDoctor);
+adminRouter.put('/doctor/edit-info', upload.single('image'), putEditDoctorInfo);
 adminRouter.patch('/doctor/update-status', patchDeactiveOrReactiveDoctor);
-adminRouter.put('/doctor/edit-info', putEditDoctorInfo);
 
 // admin staff routes
 adminRouter.get('/staff/get-all', getAdminStaffs);

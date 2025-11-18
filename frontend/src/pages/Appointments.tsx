@@ -105,7 +105,7 @@ const Appointment: React.FC = () => {
                         <img src={docInfo?.image} alt="" />
                     </div>
                     <div className="flex-1 border border-gray-400 rounded-lg p-8 py-7 bg-white mx-2 sm:mx-0 mt-[-80px] sm:mt-0">
-                        {/* -------- Doc Info : name, degree, experience -------- */}
+                        {/* -------- Doc Info : name, qualification:, experience -------- */}
                         <p className="flex items-center gap-2 text-2xl font-medium text-gray-900">
                             {docInfo.name}{' '}
                             <img
@@ -116,7 +116,7 @@ const Appointment: React.FC = () => {
                         </p>
                         <div className="flex items-center gap-2 text-sm mt-1 text-gray-600">
                             <p>
-                                {docInfo.degree} - {docInfo.speciality}
+                                {docInfo.qualification} - {docInfo.speciality}
                             </p>
                             <button className="py-0.5 px-2 border text-xs rounded-full cursor-pointer">
                                 {docInfo.experience}

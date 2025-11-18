@@ -12,6 +12,7 @@ import { Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import PrivateRoute from '@components/PrivateRoute';
 import Specialities from '@pages/admin/Spcialities';
+import AdminDoctors from '@pages/admin/AdminDoctors';
 
 const Router: React.FC = () => {
     return (
@@ -35,6 +36,10 @@ const Router: React.FC = () => {
                     <Route
                         path="specialities"
                         element={<PrivateRoute element={<Specialities />} />}
+                    />
+                    <Route
+                        path="doctors"
+                        element={<PrivateRoute element={<AdminDoctors />} />}
                     />
                 </Route>
             </Routes>

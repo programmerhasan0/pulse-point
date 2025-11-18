@@ -1,20 +1,17 @@
-export interface Speciality {
-    url: string;
-    speciality: string;
-    image: string;
-}
+import { Speciality } from '@definitions/utils';
 
 export interface Doctor {
     _id: string;
+    email: string;
+    phone: string;
     name: string;
+    age: number;
     image: string;
-    speciality: string;
-    degree: string;
-    experience: string;
-    about: string;
     fees: number;
-    address: {
-        line1: string;
-        line2: string;
-    };
+    gender: 'm' | 'f' | 't';
+    speciality: Speciality;
+    qualification: string;
+    isActive: boolean;
+    isConsulting: boolean;
+    experience: number;
 }
