@@ -11,6 +11,7 @@ import adminRouter from './src/routes/admin.route.js';
 import appointmentRouter from './src/routes/appointment.route.js';
 import doctorRouter from './src/routes/doctor.route.js';
 import staffRouter from './src/routes/staff.route.js';
+import publicRouter from './src/routes/public.route.js';
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.get('/', (req, res) =>
 
 // routes
 app.use('/api/auth/', authRouter);
+app.use('/api/public', publicRouter);
 app.use('/api/admin/', authMiddleware, adminRouter);
 app.use('/api/appointment/', authMiddleware, appointmentRouter);
 app.use('/api/doctor/', authMiddleware, doctorRouter);

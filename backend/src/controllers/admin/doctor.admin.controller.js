@@ -6,7 +6,6 @@ import { isValidObjectId } from 'mongoose';
 
 export const postAddDoctor = async (req, res) => {
     if (req.user?.role === 'admin') {
-        console.log(req.file);
         try {
             const {
                 email,
@@ -40,6 +39,7 @@ export const postAddDoctor = async (req, res) => {
                 .createHash('sha256')
                 .update(pwPublicToken)
                 .digest('hex');
+            console.log(pwPublicToken);
 
             const doctor = new User({
                 name,

@@ -1,7 +1,8 @@
-import { doctors, specialityData } from '@assets/assets_frontend/assets';
 import { AppContext } from '@context/contexts';
+import { Doctor } from '@definitions/assets';
 import { AppContextValue } from '@definitions/context';
 import { User } from '@definitions/user';
+import { Speciality } from '@definitions/utils';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
@@ -16,16 +17,8 @@ const AppContextProvider: React.FC<Props> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
-
-    const value: AppContextValue = {
-        doctors,
-        specialityData,
-        currencySymbol,
-        user: { user, setUser },
-        isLoggedIn: { isLoggedIn, setIsLoggedIn },
-        isAuthLoading: { isAuthLoading, setIsAuthLoading },
-        token,
-    };
+    const [doctors, setDoctors] = useState<Doctor[]>([]);
+    const [specialityData, setSpecialityData] = useState<Speciality[]>([]);
 
     useEffect(() => {
         if (!token) {
@@ -52,6 +45,32 @@ const AppContextProvider: React.FC<Props> = ({ children }) => {
                 });
         }
     }, [token]);
+
+    useEffect(() => {
+        axios
+            .get(`${import.meta.env.VITE_BACKEND_URL}/public/doctor/get-all`)
+            .then((res) => {
+                setDoctors(res.data.data);
+            });
+
+        axios
+            .get(
+                `${import.meta.env.VITE_BACKEND_URL}/public/specialities/get-all`
+            )
+            .then((res) => {
+                setSpecialityData(res.data.data);
+            });
+    }, []);
+
+    const value: AppContextValue = {
+        doctors,
+        specialityData,
+        currencySymbol,
+        user: { user, setUser },
+        isLoggedIn: { isLoggedIn, setIsLoggedIn },
+        isAuthLoading: { isAuthLoading, setIsAuthLoading },
+        token,
+    };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

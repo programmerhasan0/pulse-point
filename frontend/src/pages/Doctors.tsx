@@ -1,6 +1,6 @@
 import DoctorCard from '@components/DoctorCard';
 import { AppContext } from '@context/contexts';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Doctor } from '@definitions/assets';
 import slugify from 'slugify';
@@ -13,21 +13,21 @@ const Doctors: React.FC = () => {
 
     const { doctors, specialityData } = useContext(AppContext);
 
-    const applyFilter = () => {
+    const applyFilter = useCallback(() => {
         if (specialityParam) {
             setFilterDoc(
                 doctors.filter(
-                    (doc) => slugify(doc.speciality) === specialityParam
+                    (doc) => slugify(doc.speciality.slug) === specialityParam
                 )
             );
         } else {
             setFilterDoc(doctors);
         }
-    };
+    }, [doctors, specialityParam]);
 
     useEffect(() => {
         applyFilter();
-    }, [doctors, specialityParam]);
+    }, [doctors, specialityParam, applyFilter]);
 
     return (
         <div>
@@ -47,14 +47,14 @@ const Doctors: React.FC = () => {
                     {specialityData.map((speciality) => (
                         <p
                             onClick={() =>
-                                specialityParam === speciality.url
+                                specialityParam === speciality.slug
                                     ? navigate('/doctors')
-                                    : navigate(`/doctors/${speciality.url}`)
+                                    : navigate(`/doctors/${speciality.slug}`)
                             }
-                            className={`capitalize w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${specialityParam === speciality.url ? 'bg-indigo-100 text-black' : ''}`}
-                            key={speciality.url}
+                            className={`capitalize w-[94vw] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${specialityParam === speciality.slug ? 'bg-indigo-100 text-black' : ''}`}
+                            key={speciality.slug}
                         >
-                            {speciality.speciality}
+                            {speciality.title}
                         </p>
                     ))}
                 </div>

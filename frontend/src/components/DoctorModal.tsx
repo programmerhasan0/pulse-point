@@ -98,8 +98,8 @@ const DoctorModal: React.FC<PropTypes> = ({
             .then((res) => {
                 fetchAllDoctors!();
                 toast.success(res.data.message);
-                onClose();
                 reset();
+                onClose();
             })
             .catch((err) => {
                 toast.error(err.response.data.message);
@@ -230,16 +230,11 @@ const DoctorModal: React.FC<PropTypes> = ({
                             />
                         </div>
                         <div className="w-full">
-                            <p>
-                                Image{' '}
-                                <span className="text-amber-600 font-medium text-xs">
-                                    (Can't be uploaded due to hosting
-                                    limitations. Please provide link.)
-                                </span>
-                            </p>
+                            <p>Image</p>
                             <input
-                                className="border border-zinc-300 rounded w-full p-2 mt-1 focus:outline-none focus:border-primary"
+                                className="border border-zinc-300 rounded w-full p-2 mt-1 focus:outline-none focus:border-primary hover:cursor-pointer"
                                 type="file"
+                                placeholder=""
                                 accept="image/*"
                                 {...register('image')}
                             />

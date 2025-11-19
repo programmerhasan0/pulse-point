@@ -6,6 +6,7 @@ import { TimeSlot } from '@definitions/doctor';
 import { assets } from '@assets/assets_frontend/assets';
 import RelatedDoctors from '@components/RelatedDoctors';
 import AppointmentModal from '@components/AppointmentModal';
+import axios from 'axios';
 
 const Appointment: React.FC = () => {
     const daysOfWeek: string[] = [
@@ -17,7 +18,7 @@ const Appointment: React.FC = () => {
         'FRI',
         'SAT',
     ];
-    const { doctors, currencySymbol } = useContext(AppContext);
+    const { currencySymbol } = useContext(AppContext);
     const { docId } = useParams<{ docId: string }>();
     const [docInfo, setDocInfo] = useState<Doctor | null>(null);
     const [docSlots, setDocSlots] = useState<TimeSlot[][]>([]);
@@ -28,14 +29,15 @@ const Appointment: React.FC = () => {
 
     // fetching doctor info
     const fetchDocInfo = useCallback(async () => {
-        const docInfo = doctors.find((doc) => doc._id === docId);
-        if (docInfo) {
-            setDocInfo(docInfo);
-            console.log(docInfo);
-        } else {
-            console.log('No doctors found');
-        }
-    }, [doctors, docId]);
+        axios
+            .get(`${import.meta.env.VITE_BACKEND_URL}/public/doctor/${docId}`)
+            .then((res) => {
+                setDocInfo(res.data.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, [docId]);
 
     const getAvailableSlots = async () => {
         setDocSlots([]);
@@ -116,10 +118,11 @@ const Appointment: React.FC = () => {
                         </p>
                         <div className="flex items-center gap-2 text-sm mt-1 text-gray-600">
                             <p>
-                                {docInfo.qualification} - {docInfo.speciality}
+                                {docInfo.qualification} -{' '}
+                                {docInfo.speciality.title}
                             </p>
                             <button className="py-0.5 px-2 border text-xs rounded-full cursor-pointer">
-                                {docInfo.experience}
+                                {docInfo.experience} Years
                             </button>
                         </div>
                         {/* -------- Doc About -------- */}
@@ -127,8 +130,15 @@ const Appointment: React.FC = () => {
                             <p className="flex items-center gap-1 text-sm font-medium text-gray-900 mt-3">
                                 About <img src={assets.info_icon} alt="" />
                             </p>
-                            <p className="text-sm text-gray-500 max-w-[700px] mt-1">
-                                {docInfo.about}
+                            <p className="text-sm text-gray-500 max-w-[700px] mt-1 text-justify">
+                                Dr. {docInfo.name} has a strong commitment to
+                                delivering comprehensive medical care, focusing
+                                on preventive medicine, early diagnosis, and
+                                effective treatment strategies. Dr.{' '}
+                                {docInfo.name} has a strong commitment to
+                                delivering comprehensive medical care, focusing
+                                on preventive medicine, early diagnosis, and
+                                effective treatment strategies.
                             </p>
                         </div>
                         <p className="text-gray-500 font-medium mt-4">
@@ -189,7 +199,10 @@ const Appointment: React.FC = () => {
                 </div>
                 {/* -------- Listing related doctors -------- */}
 
-                <RelatedDoctors docId={docId} speciality={docInfo.speciality} />
+                <RelatedDoctors
+                    docId={docId}
+                    speciality={docInfo.speciality.slug}
+                />
                 <AppointmentModal
                     isAppointmentModalOpen={isAppointmentModalOpen}
                     setIsAppointmentModalOpen={setIsAppointmentModalOpen}

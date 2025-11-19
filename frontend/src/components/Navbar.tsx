@@ -56,7 +56,7 @@ const Navbar: React.FC = () => {
                         >
                             <img
                                 className="w-8 rounded-full"
-                                src={assets.profile_pic}
+                                src={user?.image || assets.profile_pic}
                                 alt=""
                             />
                             <img

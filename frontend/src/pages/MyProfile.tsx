@@ -63,7 +63,7 @@ const MyProfile: React.FC = () => {
             <div>
                 <img
                     className="w-36 rounded "
-                    src={assets.profile_pic}
+                    src={user?.image || assets.profile_pic}
                     alt=""
                 />
                 {isEdit ? (

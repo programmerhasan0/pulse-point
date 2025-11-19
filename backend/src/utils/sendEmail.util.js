@@ -75,6 +75,6 @@ export const sendCreatePasswordMail = ({ name, email, role }, token) => {
 
     apiInstance
         .sendTransacEmail(message)
-        .then((res) => console.log('Email res : ', res))
+        .then((res) => console.log('mail sent', res))
         .catch((err) => console.log('email err', err));
 };
