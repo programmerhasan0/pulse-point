@@ -70,7 +70,7 @@ export const sendCreatePasswordMail = ({ name, email, role }, token) => {
     <p>Hi ${role === 'doctor' ? 'doctor' : 'prouded staff'}, ${name} </p>
     <h3>Welcome to Pulse Point</h3>
     <hr/>
-    <p>Please create your password by clicking <a href="${process.env.FRONTEND_URL}/doctor/create-password?token=${token}">here</a></p>
+    <p>Please create your password by clicking <a href="${process.env.FRONTEND_URL}/create-password?token=${token}">here</a></p>
     `;
 
     apiInstance

@@ -14,6 +14,7 @@ import PrivateRoute from '@components/PrivateRoute';
 import Specialities from '@pages/admin/Spcialities';
 import AdminDoctors from '@pages/admin/AdminDoctors';
 import ForgetPassword from '@pages/ForgetPassword';
+import CreatePassword from '@pages/CreatePassword';
 
 const Router: React.FC = () => {
     return (
@@ -25,6 +26,7 @@ const Router: React.FC = () => {
                 <Route path="/doctors" element={<Doctors />} />
                 <Route path="/doctors/:specialityParam" element={<Doctors />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/create-password" element={<CreatePassword />} />
                 <Route path="/reset-password" element={<ForgetPassword />}>
                     <Route path=":resetToken" element={<ForgetPassword />} />
                 </Route>

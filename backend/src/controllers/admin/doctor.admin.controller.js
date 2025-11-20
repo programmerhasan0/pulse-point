@@ -89,6 +89,7 @@ export const postAddDoctor = async (req, res) => {
 export const getAdminDoctors = async (req, res) => {
     if (req.user?.role === 'admin' || req.user?.role === 'staff') {
         const doctors = await User.find({ role: 'doctor' })
+            .sort({ _id: 'desc' })
             .select('-password -token -__v')
             .populate({ path: 'speciality', select: '-__v' });
 
