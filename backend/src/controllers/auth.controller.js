@@ -38,6 +38,16 @@ export const postLogin = async (req, res, next) => {
                     process.env.JWT_PASS,
                     { expiresIn: '1d' }
                 );
+
+                if (
+                    (user.role === 'doctor' || user.role === 'staff') &&
+                    user.isActive === false
+                ) {
+                    return new ApiResponse(res).unauthorized(
+                        'You are not an active user. Please contact the administrator.'
+                    );
+                }
+
                 return new ApiResponse(res).success(
                     200,
                     'ops success',
@@ -280,7 +290,7 @@ export const getMe = async (req, res) => {
 };
 
 export const putUpdateUser = async (req, res) => {
-    if (req.user?.role === 'patient') {
+    if (req.user?.role === 'patient' || req.user?.role === 'admin') {
         try {
             const {
                 name,

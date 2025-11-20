@@ -20,6 +20,7 @@ const MyProfile: React.FC = () => {
         register,
         handleSubmit,
         watch,
+        reset,
         formState: { errors },
     } = useForm<User>();
 
@@ -32,25 +33,66 @@ const MyProfile: React.FC = () => {
             data.isChangingPassword = true;
         }
 
-        axios
-            .put(
-                `${import.meta.env.VITE_BACKEND_URL}/auth/update-profile`,
-                data,
-                { headers: { Authorization: token } }
-            )
-            .then((res) => {
-                toast.success(res.data.message);
-                setUser(res.data.data);
-                setIsEdit(false);
-            })
-            .catch((err) => {
-                toast.error(err.response.data.message);
-            })
-            .finally(() => {
-                setIsFormLoading(false);
-            });
+        if (user?.role === 'doctor') {
+            const reqData = {
+                password: data.password,
+                confirmPassword: data.confirmPassword,
+            };
 
-        console.log(data);
+            axios
+                .put(
+                    `${import.meta.env.VITE_BACKEND_URL}/doctor/change-password`,
+                    reqData,
+                    { headers: { Authorization: token } }
+                )
+                .then((res) => {
+                    reset();
+                    setIsEdit(false);
+                    toast.success(res.data.message);
+                })
+                .catch((err) => {
+                    toast.error(err.response.data.message);
+                })
+                .finally(() => setIsFormLoading(false));
+        } else if (user?.role === 'staff') {
+            const reqData = {
+                password: data.password,
+                confirmPassword: data.confirmPassword,
+            };
+            axios
+                .put(
+                    `${import.meta.env.VITE_BACKEND_URL}/staff/change-password`,
+                    reqData,
+                    { headers: { Authorization: token } }
+                )
+                .then((res) => {
+                    reset();
+                    setIsEdit(false);
+                    toast.success(res.data.message);
+                })
+                .catch((err) => {
+                    toast.error(err.response.data.message);
+                })
+                .finally(() => setIsFormLoading(false));
+        } else {
+            axios
+                .put(
+                    `${import.meta.env.VITE_BACKEND_URL}/auth/update-profile`,
+                    data,
+                    { headers: { Authorization: token } }
+                )
+                .then((res) => {
+                    toast.success(res.data.message);
+                    setUser(res.data.data);
+                    setIsEdit(false);
+                })
+                .catch((err) => {
+                    toast.error(err.response.data.message);
+                })
+                .finally(() => {
+                    setIsFormLoading(false);
+                });
+        }
     };
 
     const passwordRequired = !!password || !!confirmPassword;
@@ -66,14 +108,15 @@ const MyProfile: React.FC = () => {
                     src={user?.image || assets.profile_pic}
                     alt=""
                 />
-                {isEdit ? (
+                {isEdit &&
+                (user?.role === 'patient' || user?.role === 'admin') ? (
                     <input
                         type="text"
                         {...register('name', {
                             required: true,
                             value: user?.name,
                         })}
-                        className="bg-gray-50 text-3xl font-medium max-w-60 mt-4"
+                        className="bg-gray-50 text-3xl font-medium max-w-60 mt-4 outline-primary"
                     />
                 ) : (
                     <p className="font-medium text-3xl text-neutral-800 mt-4">
@@ -89,14 +132,15 @@ const MyProfile: React.FC = () => {
                         <p>Email Id: </p>
                         <p className="text-primary">{user?.email}</p>
                         <p className="font-medium">Phone: </p>
-                        {isEdit ? (
+                        {isEdit &&
+                        (user?.role === 'patient' || user?.role === 'admin') ? (
                             <input
                                 type="text"
                                 {...register('phone', {
                                     required: true,
                                     value: user?.phone,
                                 })}
-                                className="bg-gray-50 max-w-52"
+                                className="bg-gray-50 max-w-52 outline-primary"
                             />
                         ) : (
                             <p className="text-primary">{user?.phone}</p>
@@ -109,9 +153,10 @@ const MyProfile: React.FC = () => {
                     </p>
                     <div className="grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700">
                         <p className="font-medium">Gender:</p>
-                        {isEdit ? (
+                        {isEdit &&
+                        (user?.role === 'patient' || user?.role === 'admin') ? (
                             <select
-                                className="max-w-20 bg-gray-100"
+                                className="max-w-20 bg-gray-100 outline-primary"
                                 {...register('gender', {
                                     required: true,
                                     value: user?.gender,
@@ -127,14 +172,15 @@ const MyProfile: React.FC = () => {
                             </p>
                         )}
                         <p className="font-medium">Age: </p>
-                        {isEdit ? (
+                        {isEdit &&
+                        (user?.role === 'patient' || user?.role === 'admin') ? (
                             <input
                                 type="number"
                                 {...register('age', {
                                     required: true,
                                     value: user?.age,
                                 })}
-                                className="max-w-28 bg-gray-100 "
+                                className="max-w-28 bg-gray-100 outline-primary"
                             />
                         ) : (
                             <p className="text-gray-400">{user?.age} Yrs</p>
@@ -160,7 +206,7 @@ const MyProfile: React.FC = () => {
                                           }
                                         : undefined,
                                 })}
-                                className="max-w-28 bg-gray-100 "
+                                className="max-w-28 bg-gray-100 outline-primary"
                             />
                             <p className="font-medium">Confirm Password: </p>
                             <input
@@ -173,7 +219,7 @@ const MyProfile: React.FC = () => {
                                               'Passwords do not match.'
                                         : undefined,
                                 })}
-                                className="max-w-28 bg-gray-100 "
+                                className="max-w-28 bg-gray-100 outline-primary"
                             />
                         </div>
                     </div>
@@ -193,7 +239,9 @@ const MyProfile: React.FC = () => {
                             className="border border-primary px-8 py-2 rounded-full cursor-pointer hover:bg-primary hover:text-white transition-all duration-200 "
                             onClick={() => setIsEdit(true)}
                         >
-                            Edit
+                            {user?.role === 'patient' || user?.role === 'admin'
+                                ? 'Edit'
+                                : 'Change Password'}
                         </button>
                     )}
                 </div>

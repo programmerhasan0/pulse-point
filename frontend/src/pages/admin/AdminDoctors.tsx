@@ -17,6 +17,8 @@ const AdminDoctors: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [isEdit, setIsEdit] = useState<boolean>(false);
+    const [statusChangeLoading, setStatusChangeLoading] =
+        useState<boolean>(false);
     const [selectedDoctor, setSelectedDoctor] = useState<Doctor>();
 
     // searching a specific doctor
@@ -53,6 +55,32 @@ const AdminDoctors: React.FC = () => {
     useEffect(() => {
         fetchAllDoctors();
     }, [fetchAllDoctors]);
+
+    const changeDoctorAdminStatus = (_id: string, isActive: boolean) => {
+        if (confirm('Are you sure?')) {
+            setStatusChangeLoading(true);
+            axios
+                .patch(
+                    `${import.meta.env.VITE_BACKEND_URL}/admin/doctor/update-status`,
+                    { _id, isActive: !isActive },
+                    {
+                        headers: {
+                            Authorization: token,
+                        },
+                    }
+                )
+                .then((res) => {
+                    fetchAllDoctors();
+                    toast.success(res.data.message);
+                })
+                .catch((err) => {
+                    toast.error(err.response.data.message);
+                })
+                .finally(() => {
+                    setStatusChangeLoading(false);
+                });
+        }
+    };
 
     if (user?.role !== 'admin') {
         return <Navigate to="/" />;
@@ -206,12 +234,23 @@ const AdminDoctors: React.FC = () => {
                                                     setSelectedDoctor(doctor);
                                                     setIsModalOpen(true);
                                                 }}
-                                                className="px-2 py-1 text-sm bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200"
+                                                className="px-2 py-1 text-sm bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 cursor-pointer"
                                             >
                                                 Edit
                                             </button>
-                                            <button className="px-2 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200">
-                                                Delete
+                                            <button
+                                                className={`px-2 py-1 text-sm cursor-pointer rounded ${doctor.isActive ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'} disabled:cursor-not-allowed`}
+                                                onClick={() =>
+                                                    changeDoctorAdminStatus(
+                                                        doctor._id,
+                                                        doctor.isActive
+                                                    )
+                                                }
+                                                disabled={statusChangeLoading}
+                                            >
+                                                {doctor.isActive
+                                                    ? 'Deactive'
+                                                    : 'Reactive'}
                                             </button>
                                         </div>
                                     </td>

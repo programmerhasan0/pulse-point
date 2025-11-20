@@ -19,7 +19,7 @@ interface FormTypes {
     phone: string;
     name: string;
     age: number;
-    image: FileList;
+    image: FileList | string;
     fees: number;
     gender: 'm' | 'f' | 't';
     speciality: Speciality;
@@ -110,29 +110,32 @@ const DoctorModal: React.FC<PropTypes> = ({
     };
 
     useEffect(() => {
-        if (isEdit) {
-            // todo : reset form while editing
-            reset({
-                name: selectedDoctor?.name,
-                email: selectedDoctor?.email,
-                phone: selectedDoctor?.phone,
-                age: selectedDoctor?.age,
-                gender: selectedDoctor?.gender,
-                speciality: selectedDoctor?.speciality,
-                qualification: selectedDoctor?.qualification,
-                experience: selectedDoctor?.experience,
-                fees: selectedDoctor?.fees,
-            });
-        } else {
-            reset();
+        if (open) {
+            reset(
+                isEdit
+                    ? selectedDoctor
+                    : {
+                          email: '',
+                          phone: '',
+                          name: '',
+                          age: undefined,
+                          image: '',
+                          fees: undefined,
+                          gender: 'm',
+                          speciality: undefined,
+                          qualification: '',
+                          isActive: false,
+                          isConsulting: false,
+                          experience: undefined,
+                      }
+            );
         }
-    }, [reset, isEdit, selectedDoctor]);
+    }, [reset, isEdit, selectedDoctor, open]);
 
     return (
         <Modal
             open={open}
             onClose={() => {
-                reset();
                 onClose();
             }}
         >
