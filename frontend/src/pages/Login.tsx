@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ClipLoader } from 'react-spinners';
+import { NavLink, Navigate } from 'react-router-dom';
 
 axios.defaults.withCredentials = true;
 
@@ -21,8 +22,9 @@ const Login: React.FC = () => {
         formState: { errors },
     } = useForm<RegisterLoginFormInput>();
     const {
-        user: { setUser },
+        user: { user, setUser },
         isLoggedIn: { setIsLoggedIn },
+        token,
     } = useContext(AppContext);
     const location = useLocation();
     const navigate = useNavigate();
@@ -73,6 +75,10 @@ const Login: React.FC = () => {
         reset();
         scrollTo(0, 0);
     }, [isRegisterForm, reset]);
+
+    if (token && user?._id) {
+        return <Navigate to="/" />;
+    }
 
     return (
         <form
@@ -209,15 +215,26 @@ const Login: React.FC = () => {
                         </span>
                     </p>
                 ) : (
-                    <p>
-                        New to Pulse point?{' '}
-                        <span
-                            className="text-primary cursor-pointer underline"
-                            onClick={() => setIsRegisterForm(true)}
-                        >
-                            Create Account
-                        </span>
-                    </p>
+                    <>
+                        <p>
+                            New to Pulse point?{' '}
+                            <span
+                                className="text-primary cursor-pointer underline"
+                                onClick={() => setIsRegisterForm(true)}
+                            >
+                                Create Account
+                            </span>
+                        </p>
+                        <p>
+                            Forgot Password?{' '}
+                            <NavLink
+                                to="/reset-password"
+                                className="text-primary cursor-pointer underline"
+                            >
+                                Reset Here
+                            </NavLink>
+                        </p>
+                    </>
                 )}
             </div>
         </form>

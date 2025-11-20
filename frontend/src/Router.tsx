@@ -13,6 +13,7 @@ import { ToastContainer } from 'react-toastify';
 import PrivateRoute from '@components/PrivateRoute';
 import Specialities from '@pages/admin/Spcialities';
 import AdminDoctors from '@pages/admin/AdminDoctors';
+import ForgetPassword from '@pages/ForgetPassword';
 
 const Router: React.FC = () => {
     return (
@@ -24,6 +25,9 @@ const Router: React.FC = () => {
                 <Route path="/doctors" element={<Doctors />} />
                 <Route path="/doctors/:specialityParam" element={<Doctors />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/reset-password" element={<ForgetPassword />}>
+                    <Route path=":resetToken" element={<ForgetPassword />} />
+                </Route>
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route
