@@ -4,6 +4,7 @@ import { DoctorAppointment as DoctorAppointmentType } from '@definitions/utils';
 import { genderMap } from '@utils/genderMap';
 import ChangeAppointmentStatusModal from '@components/ChangeAppointmentStatusModal';
 import { useState } from 'react';
+import ViewNotesModal from './ViewNotesModal';
 
 const DoctorAppointment: React.FC<{ item: DoctorAppointmentType }> = ({
     item,
@@ -26,6 +27,7 @@ const DoctorAppointment: React.FC<{ item: DoctorAppointmentType }> = ({
         useState<boolean>(false);
     const [selectedAppointment, setSelectedAppointment] =
         useState<DoctorAppointmentType>(item);
+    const [notesModalOpen, setNotesModalOpen] = useState<boolean>(false);
 
     const date = new Date(selectedAppointment.date);
     return (
@@ -85,7 +87,10 @@ const DoctorAppointment: React.FC<{ item: DoctorAppointmentType }> = ({
                 </div>
                 <div></div>
                 <div className="flex flex-col gap-2 justify-end">
-                    <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded cursor-pointer hover:text-white hover:bg-primary transition-all duration-200">
+                    <button
+                        onClick={() => setNotesModalOpen(true)}
+                        className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded cursor-pointer hover:text-white hover:bg-primary transition-all duration-200"
+                    >
                         View Notes
                     </button>
                     <button
@@ -101,6 +106,11 @@ const DoctorAppointment: React.FC<{ item: DoctorAppointmentType }> = ({
                 onClose={() => setAppointmentChangeStatusModal(false)}
                 appointment_id={selectedAppointment._id}
                 setSelectedAppointment={setSelectedAppointment}
+            />
+            <ViewNotesModal
+                open={notesModalOpen}
+                onClose={() => setNotesModalOpen(false)}
+                notes={selectedAppointment.notes}
             />
         </div>
     );

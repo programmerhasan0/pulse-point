@@ -1,5 +1,6 @@
 import { AppContext } from '@context/contexts';
 import { Doctor } from '@definitions/assets';
+import axios from 'axios';
 import { FormEvent, useContext, useState } from 'react';
 import Modal, { ModalProps } from 'react-responsive-modal';
 import { ClipLoader } from 'react-spinners';
@@ -27,6 +28,7 @@ const AppointmentModal: React.FC<PropTypes> = ({
     const {
         user: { user },
         currencySymbol,
+        token,
     } = useContext(AppContext);
     const [isFormLoading, setIsFormLoading] = useState<boolean>(false);
 
@@ -36,12 +38,21 @@ const AppointmentModal: React.FC<PropTypes> = ({
     const onSubmit = (e: FormEvent) => {
         e.preventDefault();
         const reqData: ReqTypes = { doctor_id: doctor._id, date, time };
-
-        if (!reqData.time) {
-            return toast.error('Please Select a time.');
-        }
-
-        console.log(reqData);
+        setIsFormLoading(true);
+        axios
+            .post(
+                `${import.meta.env.VITE_BACKEND_URL}/appointment/create`,
+                reqData,
+                { headers: { Authorization: token } }
+            )
+            .then((res) => {
+                toast.success(res.data.message);
+                onClose();
+            })
+            .catch((err) => {
+                toast.error(err.response.data.message);
+            })
+            .finally(() => setIsFormLoading(false));
     };
 
     return (
