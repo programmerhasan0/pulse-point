@@ -327,3 +327,47 @@ export const deleteAppointmentNote = async (req, res) => {
 
     return new ApiResponse(res).error(404, 'not found', 'Note not found');
 };
+
+export const getSingleDoctorAppointments = async (req, res) => {
+    if (req.user?.role === 'doctor') {
+        // fetching apointment data's ==> last 7 days (including today)
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const appointments = await Appointment.find({
+            doctor: req.user?._id,
+            updatedAt: {
+                $gte: sevenDaysAgo,
+                $lte: new Date(), // up to today
+            },
+        })
+            .select('-__v')
+            .populate({
+                path: 'user',
+                select: '-password -__v -token -isActive -role',
+            })
+            .populate({
+                path: 'notes.user',
+                select: '-password -__v -token -appointments',
+            });
+
+        if (appointments.length) {
+            return new ApiResponse(res).success(
+                200,
+                'ok',
+                'data fetched',
+                appointments
+            );
+        } else {
+            return new ApiResponse(res).error(
+                404,
+                'not found',
+                'sorry appointments not found'
+            );
+        }
+    } else {
+        return new ApiResponse(res).unauthorized(
+            'You are not allowed perform this operation.'
+        );
+    }
+};

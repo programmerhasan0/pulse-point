@@ -11,7 +11,6 @@ import {
     sendPasswordResetMail,
     sendWelcomeEmail,
 } from '../utils/sendEmail.util.js';
-import { isValidObjectId } from 'mongoose';
 
 export const postLogin = async (req, res, next) => {
     try {

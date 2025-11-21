@@ -10,6 +10,7 @@ import {
     putCompleteOrCancelAppointment,
     putAddAppointmentNote,
     deleteAppointmentNote,
+    getSingleDoctorAppointments,
 } from '../controllers/appointment.controller.js';
 
 // admin's and staff's appointment related routes
@@ -25,5 +26,8 @@ appointmentRouter.post('/create', postCreateAppointment);
 appointmentRouter.put('/change-status/:_id', putCompleteOrCancelAppointment);
 appointmentRouter.put('/edit', putEditAppointmentDateTime);
 appointmentRouter.get('/view/:appointmentId', getSingleAppointment);
+
+// doctor related routes
+appointmentRouter.get('/doctor/view', getSingleDoctorAppointments);
 
 export default appointmentRouter;

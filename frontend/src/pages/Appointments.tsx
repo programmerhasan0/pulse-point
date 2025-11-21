@@ -7,6 +7,7 @@ import { assets } from '@assets/assets_frontend/assets';
 import RelatedDoctors from '@components/RelatedDoctors';
 import AppointmentModal from '@components/AppointmentModal';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Appointment: React.FC = () => {
     const daysOfWeek: string[] = [
@@ -18,7 +19,11 @@ const Appointment: React.FC = () => {
         'FRI',
         'SAT',
     ];
-    const { currencySymbol } = useContext(AppContext);
+    const {
+        currencySymbol,
+        user: { user },
+        token,
+    } = useContext(AppContext);
     const { docId } = useParams<{ docId: string }>();
     const [docInfo, setDocInfo] = useState<Doctor | null>(null);
     const [docSlots, setDocSlots] = useState<TimeSlot[][]>([]);
@@ -87,6 +92,24 @@ const Appointment: React.FC = () => {
         }
     };
 
+    const openModal = () => {
+        if (token && user?.role === 'patient') {
+            if (slotTime.length < 1) {
+                toast.error('Please select a time.');
+            } else {
+                setIsAppointmentModalOpen(true);
+            }
+        } else if (token && user?.role !== 'patient') {
+            return toast.error(
+                'You are not authorize to book an appointment. Please register yourself as a patient'
+            );
+        } else {
+            return toast.error(
+                'Unauthorized. Please login before booking appointment'
+            );
+        }
+    };
+
     useEffect(() => {
         fetchDocInfo();
     }, [fetchDocInfo]);
@@ -95,9 +118,6 @@ const Appointment: React.FC = () => {
         getAvailableSlots();
     }, [docInfo]);
 
-    useEffect(() => {
-        console.log(docSlots);
-    }, [docSlots]);
     return (
         docInfo && (
             <div>
@@ -109,7 +129,7 @@ const Appointment: React.FC = () => {
                     <div className="flex-1 border border-gray-400 rounded-lg p-8 py-7 bg-white mx-2 sm:mx-0 mt-[-80px] sm:mt-0">
                         {/* -------- Doc Info : name, qualification:, experience -------- */}
                         <p className="flex items-center gap-2 text-2xl font-medium text-gray-900">
-                            {docInfo.name}{' '}
+                            Dr. {docInfo.name}{' '}
                             <img
                                 className="w-5 "
                                 src={assets.verified_icon}
@@ -158,7 +178,7 @@ const Appointment: React.FC = () => {
                             docSlots.map((item, idx) => (
                                 <div
                                     onClick={() => setSlotIndex(idx)}
-                                    className={`text-center py-6 min-w-16 rounded-full transition-all duration-200 cursor-pointer ${slotIndex === idx ? 'bg-primary text-white' : 'border border-gray-200'}`}
+                                    className={`text-center py-6 min-w-16 rounded-full ${item.length < 1 && 'hidden'} transition-all duration-200 cursor-pointer ${slotIndex === idx ? 'bg-primary text-white' : 'border border-gray-200'}`}
                                     key={idx}
                                 >
                                     <p>
@@ -192,7 +212,7 @@ const Appointment: React.FC = () => {
 
                     <button
                         className="bg-primary text-white text-sm font-light px-14 py-3 rounded-full my-6 cursor-pointer"
-                        onClick={() => setIsAppointmentModalOpen(true)}
+                        onClick={openModal}
                     >
                         Book an appointment
                     </button>
@@ -204,11 +224,11 @@ const Appointment: React.FC = () => {
                     speciality={docInfo.speciality.slug}
                 />
                 <AppointmentModal
-                    isAppointmentModalOpen={isAppointmentModalOpen}
-                    setIsAppointmentModalOpen={setIsAppointmentModalOpen}
-                    docInfo={docInfo}
-                    slotIndex={slotIndex}
-                    slotTime={slotTime}
+                    open={isAppointmentModalOpen}
+                    onClose={() => setIsAppointmentModalOpen(false)}
+                    doctor={docInfo}
+                    dateIndex={slotIndex}
+                    time={slotTime}
                 />
             </div>
         )

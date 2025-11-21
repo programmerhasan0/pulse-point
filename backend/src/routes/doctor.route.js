@@ -9,4 +9,5 @@ const doctorRouter = Router();
 doctorRouter.put('/change-consulting-status', putUpdateConsultingStatus);
 doctorRouter.put('/change-password', putDoctorUpdatePassword);
 
+
 export default doctorRouter;

@@ -11,11 +11,14 @@ const Appointment: React.FC<PropTypes> = ({ item }) => {
                 <img className="w-32 bg-indigo-50" src={item.image} alt="" />
             </div>
             <div className="flex-1 text-sm text-zinc-600 ">
-                <p className="text-neutral-800 font-semibold ">{item.name}</p>
-                <p>{item.speciality}</p>
+                <p className="text-neutral-800 font-semibold ">
+                    {' '}
+                    Dr. {item.name}
+                </p>
+                <p>{item.speciality.title}</p>
                 <p className="text-zinc-700 font-medium mt-1">Address:</p>
-                <p className="text-xs">{item.address.line1}</p>
-                <p className="text-xs">{item.address.line2}</p>
+                <p className="text-xs">House no: 3060, Mominpara</p>
+                <p className="text-xs">Tetulia, Panchagarh</p>
                 <p className="text-xs mt-1 ">
                     <span className="text-sm text-neutral-700 font-medium">
                         Date & Time:

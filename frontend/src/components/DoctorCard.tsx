@@ -38,7 +38,7 @@ const DoctorCard: React.FC<Props> = ({ doctor }: Props) => {
                     )}
                 </div>
                 <p className="text-gray-900 text-lg font-medium">
-                    {doctor.name}
+                    Dr. {doctor.name}
                 </p>
                 <p className="text-gray-600 text-sm capitalize">
                     {doctor.speciality.title}

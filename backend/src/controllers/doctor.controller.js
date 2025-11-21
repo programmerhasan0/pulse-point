@@ -4,6 +4,7 @@ config();
 import User from '../models/user.model.js';
 import ApiResponse from '../utils/ApiResponse.util.js';
 import bcrypt from 'bcryptjs';
+import Appointment from '../models/appointment.model.js';
 
 export const putUpdateConsultingStatus = async (req, res) => {
     if (req.user?.role === 'doctor') {
