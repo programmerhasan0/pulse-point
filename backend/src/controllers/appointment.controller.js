@@ -223,7 +223,16 @@ export const putCompleteOrCancelAppointment = async (req, res) => {
             { _id },
             { status },
             { new: true, runValidators: true, user: req.user }
-        );
+        )
+            .select('-__v')
+            .populate({
+                path: 'user',
+                select: '-password -__v -token -isActive -role',
+            })
+            .populate({
+                path: 'notes.user',
+                select: '-password -__v -token -appointments',
+            });
         if (updatedAppointment._id) {
             return new ApiResponse(res).success(
                 200,

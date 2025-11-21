@@ -75,14 +75,28 @@ const Navbar: React.FC = () => {
                                         >
                                             My Profile
                                         </p>
-                                        <p
-                                            className="hover:text-black cursor-pointer"
-                                            onClick={() =>
-                                                navigate('my-appointments')
-                                            }
-                                        >
-                                            My Appointments
-                                        </p>
+                                        {user?.role === 'doctor' && (
+                                            <p
+                                                className="hover:text-black cursor-pointer"
+                                                onClick={() =>
+                                                    navigate(
+                                                        '/doctor/appointments'
+                                                    )
+                                                }
+                                            >
+                                                Appointments
+                                            </p>
+                                        )}
+                                        {user?.role === 'patient' && (
+                                            <p
+                                                className="hover:text-black cursor-pointer"
+                                                onClick={() =>
+                                                    navigate('my-appointments')
+                                                }
+                                            >
+                                                My Appointments
+                                            </p>
+                                        )}
                                         {user?.role === 'admin' && (
                                             <>
                                                 <p

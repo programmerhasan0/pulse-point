@@ -3,10 +3,15 @@ import { AppContext } from '@context/contexts';
 import { DoctorAppointment as DoctorAppointmentType } from '@definitions/utils';
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const DoctorAppointments: React.FC = () => {
-    const { token } = useContext(AppContext);
+    const {
+        user: { user },
+        isLoggedIn: { isLoggedIn },
+        token,
+    } = useContext(AppContext);
     const [appointments, setAppointments] = useState<DoctorAppointmentType[]>(
         []
     );
@@ -23,7 +28,11 @@ const DoctorAppointments: React.FC = () => {
             .catch((err) => {
                 toast.error(err.response.data.message);
             });
-    }, []);
+    }, [token]);
+
+    if (isLoggedIn && user?.role !== 'doctor') {
+        return <Navigate to="/" />;
+    }
 
     return (
         <div>
