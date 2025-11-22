@@ -31,6 +31,7 @@ const Appointment: React.FC = () => {
     const [slotTime, setSlotTime] = useState<string>('');
     const [isAppointmentModalOpen, setIsAppointmentModalOpen] =
         useState<boolean>(false);
+    const [bookedSlots, setBookedSlots] = useState<string[]>([]);
 
     // fetching doctor info
     const fetchDocInfo = useCallback(async () => {
@@ -110,6 +111,26 @@ const Appointment: React.FC = () => {
         }
     };
 
+    const getBookedSlots = useCallback(() => {
+        const date = new Date();
+        date.setDate(date.getDate() + slotIndex);
+
+        axios
+            .get(
+                `${import.meta.env.VITE_BACKEND_URL}/public/appointments/booked?doctor=${docId}&date=${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+            )
+            .then((res) => {
+                setBookedSlots(res.data.data);
+            })
+            .catch((err) => {
+                setBookedSlots([]);
+            });
+    }, [docId, slotIndex]);
+
+    useEffect(() => {
+        getBookedSlots();
+    }, [getBookedSlots]);
+
     useEffect(() => {
         fetchDocInfo();
     }, [fetchDocInfo]);
@@ -117,6 +138,7 @@ const Appointment: React.FC = () => {
     useEffect(() => {
         getAvailableSlots();
     }, [docInfo]);
+    console.log(bookedSlots);
 
     return (
         docInfo && (
@@ -196,13 +218,14 @@ const Appointment: React.FC = () => {
                     <div className="flex items-center gap-3 w-full overflow-x-scroll mt-4">
                         {docSlots.length &&
                             docSlots[slotIndex].map((item, idx) => (
-                                <p
+                                <button
                                     onClick={() => setSlotTime(item.time)}
                                     key={idx}
-                                    className={`text-sm font-light shrink-0 px-5 py-2 rounded-full cursor-pointer ${item.time === slotTime ? 'bg-primary text-white' : 'text-gray-400 border border-gray-300'}`}
+                                    className={`text-sm font-light shrink-0 px-5 py-2 rounded-full cursor-pointer ${item.time === slotTime ? 'bg-primary text-white' : 'text-gray-400 border border-gray-300'} outline-none disabled:cursor-not-allowed disabled:bg-gray-200`}
+                                    disabled={bookedSlots.includes(item.time)}
                                 >
                                     {item.time.toLowerCase()}
-                                </p>
+                                </button>
                             ))}
                     </div>
                     <p className="text-primary mt-4 text-sm font-light">
@@ -229,6 +252,7 @@ const Appointment: React.FC = () => {
                     doctor={docInfo}
                     dateIndex={slotIndex}
                     time={slotTime}
+                    getBookedSlots={getBookedSlots}
                 />
             </div>
         )

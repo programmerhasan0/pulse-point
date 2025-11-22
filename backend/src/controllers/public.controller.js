@@ -1,7 +1,8 @@
 import User from '../models/user.model.js';
 import ApiResponse from '../utils/ApiResponse.util.js';
 import Speciality from '../models/speciality.model.js';
-import { isValidObjectId } from 'mongoose';
+import Appointment from '../models/appointment.model.js';
+import mongoose, { isValidObjectId } from 'mongoose';
 
 export const getAllDoctors = async (req, res) => {
     const doctors = await User.find({ role: 'doctor' })
@@ -53,5 +54,37 @@ export const getAllSpecialities = async (req, res) => {
             'not found',
             'Speciality data is not available.'
         );
+    }
+};
+
+export const getBookedSlots = async (req, res) => {
+    try {
+        const { doctor, date } = req.query;
+        const start = new Date(date);
+        start.setHours(0, 0, 0, 0);
+
+        const end = new Date(date);
+        end.setHours(23, 59, 59, 999);
+
+        const booked = await Appointment.find({
+            doctor,
+            date: { $gte: start, $lte: end },
+            status: { $ne: 'cancelled' },
+        }).select('time -_id');
+
+        const timesSlots = booked.map((item) => item.time);
+
+        if (booked.length > 0) {
+            return new ApiResponse(res).success(
+                200,
+                'ok',
+                'data fetched',
+                timesSlots
+            );
+        }
+        return new ApiResponse(res).error(404, 'not found', 'data not found');
+    } catch (error) {
+        console.log(error);
+        return new ApiResponse(res).error(500, 'error', error.message);
     }
 };

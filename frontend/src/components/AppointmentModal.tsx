@@ -10,6 +10,7 @@ interface PropTypes extends ModalProps {
     doctor: Doctor;
     dateIndex: number;
     time: string;
+    getBookedSlots: () => void;
 }
 
 interface ReqTypes {
@@ -24,6 +25,7 @@ const AppointmentModal: React.FC<PropTypes> = ({
     doctor,
     dateIndex,
     time,
+    getBookedSlots,
 }) => {
     const {
         user: { user },
@@ -47,6 +49,7 @@ const AppointmentModal: React.FC<PropTypes> = ({
             )
             .then((res) => {
                 toast.success(res.data.message);
+                getBookedSlots();
                 onClose();
             })
             .catch((err) => {

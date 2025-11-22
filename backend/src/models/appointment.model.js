@@ -54,6 +54,17 @@ const appointmentSchema = new db.Schema(
     { timestamps: true }
 );
 
+// making sure one doc slot can be booked only once.
+appointmentSchema.index(
+    { doctor: 1, date: 1, time: 1 },
+    {
+        unique: true,
+        partialFilterExpression: {
+            status: { $in: ['booked', 'rescheduled', 'completed'] },
+        },
+    }
+);
+
 // checking before updating a status in appointment via middleware
 appointmentSchema.pre('findOneAndUpdate', async function (next) {
     const update = this.getUpdate();

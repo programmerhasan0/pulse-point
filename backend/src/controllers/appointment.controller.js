@@ -11,6 +11,30 @@ export const postCreateAppointment = async (req, res) => {
             return new ApiResponse(res).badRequest();
         }
 
+        // verifying if appointment date and time already exists.
+        const start = new Date(date);
+        start.setHours(0, 0, 0, 0);
+
+        const end = new Date(date);
+        end.setHours(23, 59, 59, 999);
+
+        const isAlreadyBooked = await Appointment.find({
+            doctor: doctor_id,
+            date: { $gte: start, $lte: end },
+            time,
+            status: {
+                $in: ['booked', 'completed', 'rescheduled'],
+            },
+        });
+
+        console.log(isAlreadyBooked);
+
+        if (isAlreadyBooked[0]?._id) {
+            return new ApiResponse(res).badRequest(
+                'Appointment already booked by someone else'
+            );
+        }
+
         const appointment = new Appointment({
             user: req.user._id,
             doctor: doctor_id,
@@ -350,6 +374,7 @@ export const getSingleDoctorAppointments = async (req, res) => {
                 $lte: new Date(), // up to today
             },
         })
+            .sort({ _id: -1 })
             .select('-__v')
             .populate({
                 path: 'user',
