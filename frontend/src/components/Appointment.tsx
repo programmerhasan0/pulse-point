@@ -1,29 +1,38 @@
-import { Doctor } from '@definitions/assets';
+import { PatientAppointment } from '@definitions/utils';
 
 type PropTypes = {
-    item: Doctor;
+    item: PatientAppointment;
 };
 
 const Appointment: React.FC<PropTypes> = ({ item }) => {
+    const appointmentDate = new Date(item.date);
+
     return (
         <div className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b">
             <div>
-                <img className="w-32 bg-indigo-50" src={item.image} alt="" />
+                <img
+                    className="w-32 bg-indigo-50"
+                    src={item.doctor.image}
+                    alt=""
+                />
             </div>
             <div className="flex-1 text-sm text-zinc-600 ">
                 <p className="text-neutral-800 font-semibold ">
                     {' '}
-                    Dr. {item.name}
+                    Dr. {item.doctor.name}
                 </p>
-                <p>{item.speciality.title}</p>
-                <p className="text-zinc-700 font-medium mt-1">Address:</p>
+                <p>{item.doctor.speciality.title}</p>
+                <p className="text-zinc-700 font-medium mt-1">
+                    Chamber Address:
+                </p>
                 <p className="text-xs">House no: 3060, Mominpara</p>
                 <p className="text-xs">Tetulia, Panchagarh</p>
                 <p className="text-xs mt-1 ">
                     <span className="text-sm text-neutral-700 font-medium">
                         Date & Time:
                     </span>{' '}
-                    25, July, 2024 | 8:30 PM
+                    {appointmentDate.getDate()}-{appointmentDate.getMonth() + 1}
+                    -{appointmentDate.getFullYear()} | {item.time}
                 </p>
             </div>
             <div></div>

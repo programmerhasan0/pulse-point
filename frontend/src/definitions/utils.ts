@@ -49,3 +49,27 @@ export interface DoctorAppointment {
     updatedAt: string;
     notes: note[];
 }
+
+export interface PatientAppointment {
+    _id: string;
+    doctor: {
+        _id: string;
+        email: string;
+        name: string;
+        age: number;
+        gender: 'm' | 'f' | 't';
+        role: string;
+        image: string;
+        speciality: Speciality;
+        experience: number;
+        qualification: string;
+        fees: number;
+        isConsulting: boolean;
+    };
+    date: string;
+    time: string;
+    isPaid: boolean;
+    status: 'booked' | 'completed' | 'rescheduled' | 'cancelled';
+    createdAt: string;
+    updatedAt: string;
+}

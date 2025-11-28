@@ -168,11 +168,7 @@ export const getAllAppointments = async (req, res) => {
 
     if (req.user?.role === 'patient') {
         const appointments = await Appointment.find({ user: req.user._id })
-            .select('-__v')
-            .populate({
-                path: 'user',
-                select: '-password -__v -token -isActive',
-            })
+            .select('-__v -notes -user')
             .populate({
                 path: 'doctor',
                 select: '-password -__v -token -isActive -phone',
